@@ -56,8 +56,8 @@ sound_shot = pygame.mixer.Sound('sounds/shot.wav')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
-MOVE_SPEED = [1, 2, 2, 1, 2, 3, 3, 2]
-BULLET_SPEED = [4, 5, 6, 5, 5, 5, 6, 7]
+MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
+BULLET_SPEED = [4, 5, 6, 7, 8, 9, 10, 11]
 BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
 BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
@@ -78,6 +78,7 @@ class Hero:
         self.direct = direct
         self.hp = hp
         self.moveSpeed = 2
+        self.animationTimer = 20 / MOVE_SPEED[self.rank]
 
         self.shotTimer = 0
         self.shotDelay = 60
@@ -154,6 +155,17 @@ class Hero:
             self.shotTimer -= 1
         if self.shieldLimit > 0:
             self.shieldLimit -= 1
+        if self.animationTimer > 0:
+            self.animationTimer -= 1
+
+        else:
+            self.animationTimer = 20 / MOVE_SPEED[User.rank]
+            User.count += 1
+            User.bulletSize_count += 1
+            if User.count == 3:
+                User.count = 0
+            if User.bulletSize_count == 8:
+                User.bulletSize_count = 8
 
     def draw(self):
         window.blit(self.image, self.rect)
@@ -226,18 +238,7 @@ while play:
 
     keys = pygame.key.get_pressed()
 
-    if animationTimer > 0:
-        animationTimer -= 1
 
-
-    else:
-        animationTimer = 40 / MOVE_SPEED[User.rank]
-        User.count += 1
-        User.bulletSize_count += 1
-        if User.count == 3:
-            User.count = 0
-        if User.bulletSize_count == 8:
-            User.bulletSize_count = 8
 
 
     window.fill('black')
