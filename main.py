@@ -127,7 +127,7 @@ class Hero:
             self.direct = 1
             self.image = imgHero[self.rank][self.direct][self.count]
             for obj in objects:
-                if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect.x, self.rect.y):
+                if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect.topleft):
                     self.rect.x -= 5
 
         elif keys[self.keyUP]:
