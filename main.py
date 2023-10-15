@@ -79,6 +79,7 @@ class Hero:
         if self.rank >= 7:
             self.rank = 7
         self.count = 0
+        #self.rect = pygame.Rect(px, py, TILE, TILE)
         self.bulletSize_count = 0
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
@@ -126,9 +127,9 @@ class Hero:
             self.rect.x += self.moveSpeed
             self.direct = 1
             self.image = imgHero[self.rank][self.direct][self.count]
-            for obj in objects:
-                if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect.topleft):
-                    self.rect.x -= 5
+            #for obj in objects:
+            #    if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect):
+            #        self.rect.x -= 5
 
         elif keys[self.keyUP]:
             self.rect.y -= self.moveSpeed
