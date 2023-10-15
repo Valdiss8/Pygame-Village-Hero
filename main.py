@@ -25,8 +25,8 @@ pygame.display.update()
 """Images"""
 imgBangs = [
     pygame.image.load('images/bang/bang1.png'),
-    pygame.image.load('images/bang/bang1.png'),
-    pygame.image.load('images/bang/bang1.png')
+    pygame.image.load('images/bang/bang2.png'),
+    pygame.image.load('images/bang/bang3.png')
 ]
 
 imgHero = [[[
@@ -50,10 +50,13 @@ imgHero = [[[
         pygame.image.load('images/sprites/hero_level_1/left_3.png'),
     ]
 ]]
+imgBrick = pygame.image.load('images/block_brick.png')
+
 """Sounds"""
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.wav')
 sound_shield = pygame.mixer.Sound('sounds/shield.wav')
+sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -77,26 +80,20 @@ class Hero:
             self.rank = 7
         self.count = 0
         self.bulletSize_count = 0
-
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
         self.hp = HP[self.rank]
         self.shield = False
-
-
         self.moveSpeed = 2
         self.animationTimer = 20 / MOVE_SPEED[self.rank]
-
         self.shotTimer = 0
         self.shotDelay = 60
         self.bulletSpeed = 5
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletDistance = BULLET_DISTANCE[self.rank]
         self.bulletSize = BULLET_SIZE[self.bulletSize_count]
-
         self.shieldTimer = 0
         self.shieldDelay = 60
-
         self.keyLEFT = keyList[0]
         self.keyRIGHT = keyList[1]
         self.keyUP = keyList[2]
@@ -105,7 +102,6 @@ class Hero:
         self.keySHIELD = keyList[5]
         self.keySUPER = keyList[6]
         self.image = imgHero[self.rank][self.direct][0]
-
         self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 3), self.image.get_height() + (self.rank * 3)))
         self.rect = self.image.get_rect(center=self.rect.center)
 
@@ -119,7 +115,6 @@ class Hero:
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletSize = BULLET_SIZE[self.rank]
 
-
         oldX, oldY = self.rect.topleft
 
         if keys[self.keyLEFT]:
@@ -131,6 +126,9 @@ class Hero:
             self.rect.x += self.moveSpeed
             self.direct = 1
             self.image = imgHero[self.rank][self.direct][self.count]
+            for obj in objects:
+                if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect.x, self.rect.y):
+                    self.rect.x -= 5
 
         elif keys[self.keyUP]:
             self.rect.y -= self.moveSpeed
@@ -184,6 +182,14 @@ class Hero:
         window.blit(self.image, self.rect)
 
 
+    def damage(self, value):
+        if self.shield == False:
+            self.hp -= value
+            if self.hp <= 0:
+                objects.remove(self)
+                sound_finish.play()
+
+
 class Bullet:
     def __init__(self, parent, px, py, dx, dy, damage, distance, size):
         bullets.append(self)
@@ -226,7 +232,7 @@ class Bang:
 
     def update(self):
         self.frame += 0.3
-        if self.frame >= 3:
+        if self.frame >= 2:
             objects.remove(self)
 
     def draw(self):
@@ -235,12 +241,45 @@ class Bang:
         window.blit(image, rect)
 
 
+class Block:
+    def __init__(self, px, py, size):
+        objects.append(self)
+        self.type = 'block'
+        self.rect = pygame.Rect(px, py, size, size)
+        self.hp = 1
+
+    def update(self):
+        pass
+    def draw(self):
+        window.blit(imgBrick, self.rect)
+
+
+    def damage(self, value):
+        self.hp -= value
+        if self.hp <= 0:
+            objects.remove(self)
+
+
 
 
 bullets = []
 objects = []
 User = Hero(10, 1, 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
+for _ in range(150):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects:
+            if rect.colliderect(obj.rect):
+                fined = True
+
+        if not fined:
+            break
+    Block(x, y, TILE)
+
 
 play = True
 
