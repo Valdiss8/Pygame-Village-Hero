@@ -53,6 +53,7 @@ imgHero = [[[
 """Sounds"""
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.wav')
+sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -63,20 +64,26 @@ BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 100, 150, 200, 250, 300, 350, 400]
-
+HP = [5, 6, 7, 8, 9, 10, 11, 12]
 
 class Hero:
+    """Main character"""
     def __init__(self, hp, damage, px, py, direct, keyList):
 
         objects.append(self)
         self.type = 'hero'
         self.rank = 0
+        if self.rank >= 7:
+            self.rank = 7
         self.count = 0
         self.bulletSize_count = 0
 
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
-        self.hp = hp
+        self.hp = HP[self.rank]
+        self.shield = False
+
+
         self.moveSpeed = 2
         self.animationTimer = 20 / MOVE_SPEED[self.rank]
 
@@ -87,7 +94,8 @@ class Hero:
         self.bulletDistance = BULLET_DISTANCE[self.rank]
         self.bulletSize = BULLET_SIZE[self.bulletSize_count]
 
-        self.shieldLimit = 60
+        self.shieldTimer = 0
+        self.shieldDelay = 60
 
         self.keyLEFT = keyList[0]
         self.keyRIGHT = keyList[1]
@@ -103,15 +111,14 @@ class Hero:
 
     def update(self):
         self.image = imgHero[self.rank][self.direct][0]
-
         self.rect = self.image.get_rect(center=self.rect.center)
         self.moveSpeed = MOVE_SPEED[self.rank]
         self.shotDelay = SHOT_DELAY[self.rank]
+        self.shieldDelay = SHIELD_LIMIT[self.rank]
         self.bulletSpeed = BULLET_SPEED[self.rank]
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletSize = BULLET_SIZE[self.rank]
 
-        self.shieldLimit = SHIELD_LIMIT[self.rank]
 
         oldX, oldY = self.rect.topleft
 
@@ -142,19 +149,25 @@ class Hero:
             self.shotTimer = self.shotDelay
             sound_shot.play()
 
-        if keys[self.keySHIELD]:
-            print(self.shieldLimit)
+        elif keys[self.keySHIELD] and self.shotTimer == 0:
+            self.shieldTimer = self.shieldDelay
+            self.shotTimer = self.shotDelay + self.shieldDelay
 
-            if self.shieldLimit > 0:
-                print('yes')
-                self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 2) + 2, self.image.get_height() + (self.rank * 2) + 2))
-                self.shotTimer = self.shotDelay
+        if self.shieldTimer > 0:
+            self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 1) + 3, self.image.get_height() + (self.rank * 1) + 3))
+            self.shield = True
+            sound_shield.play()
+        else:
+            self.shield = False
+            sound_shield.stop()
 
         if self.shotTimer > 0:
-            print(self.shotTimer)
             self.shotTimer -= 1
-        if self.shieldLimit > 0:
-            self.shieldLimit -= 1
+
+        if self.shieldTimer > 0:
+            self.shieldTimer -= 1
+
+
         if self.animationTimer > 0:
             self.animationTimer -= 1
 
@@ -213,7 +226,8 @@ class Bang:
 
     def update(self):
         self.frame += 0.3
-        if self.frame >= 3: objects.remove(self)
+        if self.frame >= 3:
+            objects.remove(self)
 
     def draw(self):
         image = imgBangs[int(self.frame)]
@@ -237,6 +251,8 @@ while play:
             play = False
 
     keys = pygame.key.get_pressed()
+
+
 
 
 
