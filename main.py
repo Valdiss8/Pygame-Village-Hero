@@ -1,7 +1,10 @@
 import pygame
+from actions import Bullet, Bang
+from objects import objects
 from random import randint
 
 pygame.init()
+
 '''Interface'''
 
 WIDTH, HEIGHT = 1280, 780
@@ -13,9 +16,16 @@ clock = pygame.time.Clock()
 
 """Window Name"""
 pygame.display.set_caption('Village Hero')
-
+pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
 fontUI = pygame.font.Font(None, 30)
 
+"""Surface"""
+#surf = pygame.Surface((2000, 2000))
+#surf.fill('red')
+#window.blit(surf, (50, 50))
+pygame.display.update()
+
+"""Images"""
 imgHero = [[[
     pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
     pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
@@ -38,12 +48,16 @@ imgHero = [[[
     ]
 ]]
 
+"""Sounds"""
+sound_shot = pygame.mixer.Sound('sounds/shot.wav')
+
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
 MOVE_SPEED = [1, 2, 2, 1, 2, 3, 3, 2]
 BULLET_SPEED = [4, 5, 6, 5, 5, 5, 6, 7]
 BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
 SHOT_DELAY = [60, 50, 30, 40, 30, 25, 25, 30]
+
 
 
 class Hero:
@@ -104,11 +118,24 @@ class Hero:
             self.direct = 2
             self.image = imgHero[self.rank][self.direct][self.count]
 
+        if keys[self.keySHOT] and self.shotTimer == 0:
+            dx = DIRECTS[self.direct][0] * self.bulletSpeed
+            dy = DIRECTS[self.direct][1] * self.bulletSpeed
+            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage)
+            self.shotTimer = self.shotDelay
+            sound_shot.play()
+
+        if self.shotTimer > 0: self.shotTimer -= 1
+
+        for obj in objects:
+            if obj != self and obj.type != 'bang' and obj.type != 'bonus' and self.rect.colliderect(obj.rect):
+                self.rect.topleft = oldX, oldY
+
     def draw(self):
         window.blit(self.image, self.rect)
 
 
-objects = []
+
 User = Hero(10, 1, 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
 animationTimer = 20 / MOVE_SPEED[User.rank]
 
