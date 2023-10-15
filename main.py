@@ -17,9 +17,9 @@ pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.pn
 fontUI = pygame.font.Font(None, 30)
 
 """Surface"""
-#surf = pygame.Surface((2000, 2000))
-#surf.fill('red')
-#window.blit(surf, (50, 50))
+# surf = pygame.Surface((2000, 2000))
+# surf.fill('red')
+# window.blit(surf, (50, 50))
 pygame.display.update()
 
 """Images"""
@@ -59,9 +59,10 @@ DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 MOVE_SPEED = [1, 2, 2, 1, 2, 3, 3, 2]
 BULLET_SPEED = [4, 5, 6, 5, 5, 5, 6, 7]
 BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
-BULLET_DISTANCE = [50, 60, 70, 80, 90, 100, 110, 120]
-SHOT_DELAY = [60, 50, 30, 40, 30, 25, 25, 30]
-
+BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
+BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
+SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
+SHIELD_LIMIT = [60, 100, 150, 200, 250, 300, 350, 400]
 
 
 class Hero:
@@ -70,6 +71,8 @@ class Hero:
         objects.append(self)
         self.type = 'hero'
         self.rank = 0
+        self.count = 0
+        self.bulletSize_count = 0
 
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
@@ -81,26 +84,33 @@ class Hero:
         self.bulletSpeed = 5
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletDistance = BULLET_DISTANCE[self.rank]
+        self.bulletSize = BULLET_SIZE[self.bulletSize_count]
+
+        self.shieldLimit = 60
 
         self.keyLEFT = keyList[0]
         self.keyRIGHT = keyList[1]
         self.keyUP = keyList[2]
         self.keyDOWN = keyList[3]
         self.keySHOT = keyList[4]
+        self.keySHIELD = keyList[5]
+        self.keySUPER = keyList[6]
+        self.image = imgHero[self.rank][self.direct][0]
 
-
-        self.image = imgHero[self.rank][0][0]
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 3), self.image.get_height() + (self.rank * 3)))
         self.rect = self.image.get_rect(center=self.rect.center)
-
-        self.count = 0
 
     def update(self):
         self.image = imgHero[self.rank][self.direct][0]
+
         self.rect = self.image.get_rect(center=self.rect.center)
         self.moveSpeed = MOVE_SPEED[self.rank]
         self.shotDelay = SHOT_DELAY[self.rank]
         self.bulletSpeed = BULLET_SPEED[self.rank]
         self.bulletDamage = BULLET_DAMAGE[self.rank]
+        self.bulletSize = BULLET_SIZE[self.rank]
+
+        self.shieldLimit = SHIELD_LIMIT[self.rank]
 
         oldX, oldY = self.rect.topleft
 
@@ -127,39 +137,49 @@ class Hero:
         if keys[self.keySHOT] and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
-            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance)
+            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance, self.bulletSize)
             self.shotTimer = self.shotDelay
             sound_shot.play()
-        for obj in objects:
-            if obj != self and obj.type != 'bang' and obj.type != 'bonus' and self.rect.colliderect(obj.rect):
-                self.rect.topleft = oldX, oldY
 
+        if keys[self.keySHIELD]:
+            print(self.shieldLimit)
 
+            if self.shieldLimit > 0:
+                print('yes')
+                self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 2) + 2, self.image.get_height() + (self.rank * 2) + 2))
+                self.shotTimer = self.shotDelay
 
-        if self.shotTimer > 0: self.shotTimer -= 1
+        if self.shotTimer > 0:
+            print(self.shotTimer)
+            self.shotTimer -= 1
+        if self.shieldLimit > 0:
+            self.shieldLimit -= 1
 
     def draw(self):
         window.blit(self.image, self.rect)
 
 
 class Bullet:
-    def __init__(self, parent, px, py, dx, dy, damage, distance):
+    def __init__(self, parent, px, py, dx, dy, damage, distance, size):
         bullets.append(self)
         self.parent = parent
         self.px, self.py = px, py
         self.dx, self.dy = dx, dy
         self.damage = damage
         self.distance = distance
+        self.size = size
 
     def update(self):
         self.px += self.dx
         self.py += self.dy
 
-        if self.px < 0 or self.px > WIDTH or self.py < 0 or self.py > HEIGHT:
+        if abs(self.px - self.parent.rect.x) > self.parent.bulletDistance or abs(
+                self.py - self.parent.rect.y) > self.parent.bulletDistance:
             bullets.remove(self)
         else:
             for obj in objects:
-                if obj != self.parent and obj.type !='bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.px, self.py):
+                if obj != self.parent and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.px,
+                                                                                                               self.py):
                     obj.damage(self.damage)
                     bullets.remove(self)
                     Bang(self.px, self.py)
@@ -167,8 +187,7 @@ class Bullet:
                     break
 
     def draw(self):
-        pygame.draw.circle(window, 'yellow', (self.px, self.py), 2)
-
+        pygame.draw.circle(window, 'yellow', (self.px, self.py), self.size)
 
 
 
@@ -194,8 +213,8 @@ class Bang:
 
 bullets = []
 objects = []
-User = Hero(10, 1, 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_SPACE))
-animationTimer = 20 / MOVE_SPEED[User.rank]
+User = Hero(10, 1, 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
+animationTimer = 40 / MOVE_SPEED[User.rank]
 
 play = True
 
@@ -210,11 +229,16 @@ while play:
     if animationTimer > 0:
         animationTimer -= 1
 
+
     else:
-        animationTimer = 20 / MOVE_SPEED[User.rank]
+        animationTimer = 40 / MOVE_SPEED[User.rank]
         User.count += 1
+        User.bulletSize_count += 1
         if User.count == 3:
             User.count = 0
+        if User.bulletSize_count == 8:
+            User.bulletSize_count = 8
+
 
     window.fill('black')
     for bullet in bullets:
@@ -223,8 +247,6 @@ while play:
     for obj in objects:
         obj.update()
         obj.draw()
-
-
 
     pygame.display.update()
     clock.tick(FPS)
