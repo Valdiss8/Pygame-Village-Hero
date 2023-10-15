@@ -141,6 +141,10 @@ class Hero:
             self.direct = 2
             self.image = imgHero[self.rank][self.direct][self.count]
 
+        for obj in objects:
+            if obj != self and obj.type !='bang' and obj.type != 'bonus' and self.rect.colliderect(obj.rect):
+                self.rect.topleft = oldX, oldY
+
         if keys[self.keySHOT] and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
