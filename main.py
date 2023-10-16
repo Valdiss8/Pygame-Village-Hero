@@ -462,7 +462,6 @@ class Princess:
             if self.message_time_counter == len(self.words[self.message_group_counter]) - 1:
                 self.message_group_counter += 1
                 self.message_time_counter = 0
-                print(self.message_group_counter, len(self.words) - 1)
                 if self.message_group_counter == len(self.words):
                     objects.remove(self)
                     Message(User, 'I need to help')
@@ -512,8 +511,13 @@ class Mob(Princess):
             if self.activity_timer % self.shotDelay == 0:
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
-
                 sound_mob_shot.play()
+        if self.message_time_counter == len(self.words[self.message_group_counter]) - 1:
+            self.message_group_counter += 1
+            self.message_time_counter = 0
+            print(self.message_group_counter, len(self.words) - 1)
+            if self.message_group_counter == len(self.words):
+                self.message_group_counter = 0
 
 
 bullets = []
