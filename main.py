@@ -4,7 +4,7 @@ from random import randint
 pygame.init()
 '''Interface'''
 
-WIDTH, HEIGHT = 1280, 780
+WIDTH, HEIGHT = 1200, 780
 FPS = 60
 TILE = 32
 
@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('Village Hero')
 pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
 fontUI = pygame.font.Font(None, 30)
+font_dialog = pygame.font.SysFont('microsofttaile', 15)
 
 """Surface"""
 # surf = pygame.Surface((2000, 2000))
@@ -23,12 +24,38 @@ fontUI = pygame.font.Font(None, 30)
 pygame.display.update()
 
 """Images"""
-back_map = [pygame.image.load('images/map/map_level_1/back_1').convert()]
+back_map = [pygame.image.load('images/map/map_level_1/back_1.jpg').convert()]
+img_message = pygame.image.load('images/message_2.png')
 
 imgBangs = [
     pygame.image.load('images/bang/bang1.png'),
     pygame.image.load('images/bang/bang2.png'),
     pygame.image.load('images/bang/bang3.png')
+]
+imgPrincess = [[
+    pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
+    pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
+    pygame.image.load('images/sprites/hero_level_1/forward_3.png')
+],
+    [
+        pygame.image.load('images/sprites/hero_level_1/right_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/right_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/right_3.png')
+    ],
+    [
+        pygame.image.load('images/sprites/princess/back_1.png'),
+        pygame.image.load('images/sprites/princess/back_2.png'),
+        pygame.image.load('images/sprites/princess/back_3.png'),
+        pygame.image.load('images/sprites/princess/back_4.png'),
+        pygame.image.load('images/sprites/princess/back_5.png'),
+        pygame.image.load('images/sprites/princess/back_6.png'),
+        pygame.image.load('images/sprites/princess/back_7.png'),
+    ],
+    [
+        pygame.image.load('images/sprites/hero_level_1/left_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/left_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/left_3.png'),
+    ]
 ]
 
 imgHero = [[[
@@ -71,8 +98,10 @@ SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 100, 150, 200, 250, 300, 350, 400]
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
 
+
 class Hero:
     """Main character"""
+
     def __init__(self, hp, damage, px, py, direct, keyList):
 
         objects.append(self)
@@ -81,7 +110,6 @@ class Hero:
         if self.rank >= 7:
             self.rank = 7
         self.count = 0
-        #self.rect = pygame.Rect(px, py, TILE, TILE)
         self.bulletSize_count = 0
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
@@ -105,7 +133,8 @@ class Hero:
         self.keySHIELD = keyList[5]
         self.keySUPER = keyList[6]
         self.image = imgHero[self.rank][self.direct][0]
-        self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 3), self.image.get_height() + (self.rank * 3)))
+        self.image = pygame.transform.scale(self.image, (
+            self.image.get_width() + (self.rank * 1), self.image.get_height() + (self.rank * 1)))
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self):
@@ -117,9 +146,8 @@ class Hero:
         self.bulletSpeed = BULLET_SPEED[self.rank]
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletSize = BULLET_SIZE[self.rank]
-
         oldX, oldY = self.rect.topleft
-
+        # keys and play activity
         if keys[self.keyLEFT]:
             self.rect.x -= self.moveSpeed
             self.direct = 3
@@ -129,9 +157,6 @@ class Hero:
             self.rect.x += self.moveSpeed
             self.direct = 1
             self.image = imgHero[self.rank][self.direct][self.count]
-            #for obj in objects:
-            #    if obj != self.rect and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.rect):
-            #        self.rect.x -= 5
 
         elif keys[self.keyUP]:
             self.rect.y -= self.moveSpeed
@@ -142,24 +167,33 @@ class Hero:
             self.rect.y += self.moveSpeed
             self.direct = 2
             self.image = imgHero[self.rank][self.direct][self.count]
-
+        # collision
         for obj in objects:
-            if obj != self and obj.type !='bang' and obj.type != 'bonus' and self.rect.colliderect(obj.rect):
+            if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
+                    obj.rect):
                 self.rect.topleft = oldX, oldY
+
+        # map edge
+        if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
+            print(self.rect.bottom, self.rect.top)
+            self.rect.topleft = oldX, oldY
 
         if keys[self.keySHOT] and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
-            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance, self.bulletSize)
+            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
+                   self.bulletSize)
             self.shotTimer = self.shotDelay
             sound_shot.play()
+            Message(self, ['Hello', 'Please', 'I need you'])
 
         elif keys[self.keySHIELD] and self.shotTimer == 0:
             self.shieldTimer = self.shieldDelay
             self.shotTimer = self.shotDelay + self.shieldDelay
 
         if self.shieldTimer > 0:
-            self.image = pygame.transform.scale(self.image, (self.image.get_width() + (self.rank * 1) + 3, self.image.get_height() + (self.rank * 1) + 3))
+            self.image = pygame.transform.scale(self.image, (
+                self.image.get_width() + (self.rank * 1) + 3, self.image.get_height() + (self.rank * 1) + 3))
             self.shield = True
             sound_shield.play()
         else:
@@ -171,7 +205,6 @@ class Hero:
 
         if self.shieldTimer > 0:
             self.shieldTimer -= 1
-
 
         if self.animationTimer > 0:
             self.animationTimer -= 1
@@ -187,7 +220,6 @@ class Hero:
 
     def draw(self):
         window.blit(self.image, self.rect)
-
 
     def damage(self, value):
         if self.shield == False:
@@ -216,8 +248,9 @@ class Bullet:
             bullets.remove(self)
         else:
             for obj in objects:
-                if obj != self.parent and obj.type != 'bang' and obj.type != 'bonus' and obj.rect.collidepoint(self.px,
-                                                                                                               self.py):
+                if obj != self.parent and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
+                        self.px,
+                        self.py):
                     obj.damage(self.damage)
                     bullets.remove(self)
                     Bang(self.px, self.py)
@@ -226,7 +259,6 @@ class Bullet:
 
     def draw(self):
         pygame.draw.circle(window, 'yellow', (self.px, self.py), self.size)
-
 
 
 class Bang:
@@ -257,9 +289,9 @@ class Block:
 
     def update(self):
         pass
+
     def draw(self):
         window.blit(imgBrick, self.rect)
-
 
     def damage(self, value):
         self.hp -= value
@@ -267,12 +299,138 @@ class Block:
             objects.remove(self)
 
 
+class Message:
+    def __init__(self, parent, textlist):
+        objects.append(self)
+        self.type = 'message'
+        self.bottom_right = parent.rect.topright
+        self.timer = 0
+        self.message_count = 0
+        self.textlist = textlist
+        self.text = font_dialog.render(self.textlist[self.message_count], 1, 'black')
+        self.image = img_message
+        self.rect = self.image.get_rect(bottomright=self.bottom_right)
+
+    def update(self):
+        self.timer += 0.3
+
+        if self.timer >= 30:
+            self.message_count += 1
+            self.timer = 0
+        if self.message_count < len(self.textlist):
+            self.text = font_dialog.render(self.textlist[self.message_count], 1, 'black')
+        else:
+            objects.remove(self)
+
+    def draw(self):
+        self.rect = self.image.get_rect(bottomright=self.bottom_right)
+        window.blit(self.image, self.rect)
+        window.blit(self.text, (self.rect.x + 8, self.rect.y + 10))
+
+
+class Princess:
+    def __init__(self, px, py, direct, words):
+        objects.append(self)
+        self.type = 'princess'
+        self.count = 0
+        self.rect = pygame.Rect(px, py, TILE, TILE)
+        self.direct = direct
+        self.moveSpeed = 1
+        self.words = words
+        #self.image = imgPrincess[self.direct][0]
+        self.image = pygame.transform.scale(imgPrincess[self.direct][0], (TILE * 0.58, TILE))
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.activities = 0
+        self.activity_timer = 50
+        self.animationTimer = 20 / self.moveSpeed
+        self.shield = True
+        self.hp = 2
+        self.message_time_counter = 0
+
+    def update(self):
+        self.image = imgPrincess[self.direct][0]
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+        oldX, oldY = self.rect.topleft
+
+        # Activities
+        if self.activities == 0 and self.activity_timer < 101:
+            self.rect.x -= self.moveSpeed
+            self.direct = 3
+            self.image = imgPrincess[self.direct][self.count]
+
+        if self.activities == 1 and self.activity_timer < 100:
+            self.image = imgPrincess[self.direct][self.count]
+
+        if self.activities == 2 and self.activity_timer < 100:
+            self.rect.y += self.moveSpeed
+            self.direct = 2
+            self.image = imgPrincess[self.direct][self.count]
+
+        if self.activities == 3 and self.activity_timer < 100:
+            self.rect.x += self.moveSpeed
+            self.direct = 1
+            self.image = imgPrincess[self.direct][self.count]
+
+        if self.activities == 4 and self.activity_timer < 100:
+            self.image = imgPrincess[self.direct][self.count]
+
+        if self.activities == 5 and self.activity_timer < 100:
+            self.rect.y -= self.moveSpeed
+            self.direct = 0
+            self.image = imgPrincess[self.direct][self.count]
+        if self.activities == 6 and self.activity_timer < 100:
+            self.image = imgPrincess[self.direct][self.count]
+
+        # Collision
+        for obj in objects:
+            if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
+                    obj.rect):
+                self.rect.topleft = oldX, oldY
+        # map edge
+        if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
+            print(self.rect.bottom, self.rect.top)
+            self.rect.topleft = oldX, oldY
+        # Timers
+        if self.activity_timer > 0:
+            self.activity_timer -= 1
+        else:
+            self.activity_timer = 50
+            self.activities += 1
+            if self.activities == 7:
+                self.activities = 0
+                self.message_time_counter += 1
+            if self.message_time_counter == 2:
+                Message(self, self.words)
+                self.message_time_counter = 0
+
+        if self.animationTimer > 0:
+            self.animationTimer -= 1
+        else:
+            self.animationTimer = 20 / MOVE_SPEED[0] / 2
+            self.count += 1
+
+            if self.count == 3:
+                self.count = 0
+
+    def draw(self):
+        window.blit(self.image, self.rect)
+
+    def damage(self, value):
+        if self.shield == False:
+            self.hp -= value
+            if self.hp <= 0:
+                objects.remove(self)
+                sound_finish.play()
 
 
 bullets = []
 objects = []
-User = Hero(10, 1, 100, 275, 0, (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
+User = Hero(10, 1, 100, 275, 0,
+            (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
+Princess = Princess(200, 500, 0, ['Good day!', 'Love you', 'Please', 'Help'])
+
 for _ in range(150):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -287,7 +445,6 @@ for _ in range(150):
             break
     Block(x, y, TILE)
 
-
 play = True
 
 while play:
@@ -296,14 +453,8 @@ while play:
         if event.type == pygame.QUIT:
             play = False
 
-    window.blit(back_map[0])
+    window.blit(back_map[0], (0, 0))
     keys = pygame.key.get_pressed()
-
-
-
-
-
-
 
     for bullet in bullets:
         bullet.update()
