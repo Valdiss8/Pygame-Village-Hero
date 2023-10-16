@@ -130,6 +130,7 @@ sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
 sound_mob_death = pygame.mixer.Sound('sounds/mob_death.mp3')
 sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot_1.mp3')
+sound_map_level_1 = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -446,8 +447,9 @@ class Princess:
                 self.rect.topleft = oldX, oldY
         # map edge
         if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
-            print(self.rect.bottom, self.rect.top)
+
             self.rect.topleft = oldX, oldY
+
         # Timers
         if self.activity_timer > 0:
             self.activity_timer -= 1
@@ -458,8 +460,19 @@ class Princess:
                 self.activities = 0
                 self.message_time_counter += 1
                 Message(self, self.words[self.message_group_counter][self.message_time_counter])
-            if self.message_time_counter >= len(self.words[self.message_group_counter]) - 1:
+                print(self.message_time_counter, self.message_group_counter, len(self.words[self.message_group_counter]), len(self.words))
+                print(self.words[self.message_group_counter][self.message_time_counter])
+            if self.message_time_counter == len(self.words[self.message_group_counter])-1:
+                self.message_group_counter += 1
                 self.message_time_counter = 0
+                if self.message_time_counter == len(self.words)-1:
+
+                    objects.remove(self)
+                    for i in ['I need', 'to help he', 'My goal is', 'to save her', 'I can not', 'leave her',
+                              'in danger']:
+                        Message(User, i)
+
+
 
 
         if self.animationTimer > 0:
@@ -528,8 +541,8 @@ User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-Mob(500, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 1)
-Mob(300, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 2)
+Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 1)
+Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 2)
 
 #for _ in range(150):
 #    while True:
@@ -549,6 +562,7 @@ play = True
 
 while play:
 
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
@@ -559,6 +573,7 @@ while play:
     for bullet in bullets:
         bullet.update()
         bullet.draw()
+
     for obj in objects:
         obj.update()
         obj.draw()
