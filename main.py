@@ -130,7 +130,11 @@ sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
 sound_mob_death = pygame.mixer.Sound('sounds/mob_death.mp3')
 sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot_1.mp3')
-sound_map_level_1 = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
+sound_danger = pygame.mixer.Sound('sounds/danger.mp3')
+sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
+sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
+
+
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -462,8 +466,13 @@ class Princess:
             if self.message_time_counter == len(self.words[self.message_group_counter]) - 1:
                 self.message_group_counter += 1
                 self.message_time_counter = 0
+                if self.message_group_counter == 2:
+                    sound_danger.play()
                 if self.message_group_counter == len(self.words):
                     objects.remove(self)
+                    for i in range(4):
+                        sound_map_level_1_upset.play()
+
                     Message(User, 'I need to help')
         if self.animationTimer > 0:
             self.animationTimer -= 1
@@ -501,7 +510,9 @@ class Mob(Princess):
         self.shotTimer = 0
 
     def update(self):
+        self.message_group_counter = 0
         super().update()
+
 
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(
                 abs(User.rect.center[1]) - abs(self.rect.center[1])) < 60 and self.shotTimer == 0:
@@ -512,12 +523,7 @@ class Mob(Princess):
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
                 sound_mob_shot.play()
-        if self.message_time_counter == len(self.words[self.message_group_counter]) - 1:
-            self.message_group_counter += 1
-            self.message_time_counter = 0
-            print(self.message_group_counter, len(self.words) - 1)
-            if self.message_group_counter == len(self.words):
-                self.message_group_counter = 0
+
 
 
 bullets = []
@@ -525,9 +531,9 @@ objects = []
 User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
-Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 1)
-Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 2)
+Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'],['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'],[] ], 1)
+Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'],[] ], 2)
 
 # for _ in range(150):
 #    while True:
