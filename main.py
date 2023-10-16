@@ -460,13 +460,12 @@ class Princess:
                 self.activities = 0
                 self.message_time_counter += 1
                 Message(self, self.words[self.message_group_counter][self.message_time_counter])
-                print(self.message_time_counter, self.message_group_counter, len(self.words[self.message_group_counter]), len(self.words))
-                print(self.words[self.message_group_counter][self.message_time_counter])
+
             if self.message_time_counter == len(self.words[self.message_group_counter])-1:
                 self.message_group_counter += 1
                 self.message_time_counter = 0
-                if self.message_time_counter == len(self.words)-1:
-
+                print(self.message_group_counter, len(self.words)-1)
+                if self.message_group_counter == len(self.words):
                     objects.remove(self)
                     for i in ['I need', 'to help he', 'My goal is', 'to save her', 'I can not', 'leave her',
                               'in danger']:
