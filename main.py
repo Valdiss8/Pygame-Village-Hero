@@ -80,9 +80,11 @@ imgBrick = pygame.image.load('images/block_brick.png')
 
 """Sounds"""
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
-sound_shot = pygame.mixer.Sound('sounds/shot.wav')
+sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
 sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
+sound_mob_death = pygame.mixer.Sound('sounds/mob_death.mp3')
+sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot.wav')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -95,6 +97,9 @@ SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 100, 150, 200, 250, 300, 350, 400]
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
 MOB_HP = [1, 2, 3, 4, 5, 6, 7, 8]
+MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 130]
+MOB_BULLET_DAMAGE = [1, 1, 1, 1, 2, 2, 2, 2]
+MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 2, 3, 4]
 
 
 class Hero:
@@ -113,16 +118,16 @@ class Hero:
         self.direct = direct
         self.hp = HP[self.rank]
         self.shield = False
-        self.moveSpeed = 2
+        self.moveSpeed = MOVE_SPEED[self.rank]
         self.animationTimer = 20 / MOVE_SPEED[self.rank]
         self.shotTimer = 0
-        self.shotDelay = 60
-        self.bulletSpeed = 5
+        self.shotDelay = SHOT_DELAY[self.rank]
+        self.bulletSpeed = BULLET_SPEED[self.rank]
         self.bulletDamage = BULLET_DAMAGE[self.rank]
         self.bulletDistance = BULLET_DISTANCE[self.rank]
         self.bulletSize = BULLET_SIZE[self.bulletSize_count]
         self.shieldTimer = 0
-        self.shieldDelay = 60
+        self.shieldDelay = SHIELD_LIMIT[self.rank]
         self.keyLEFT = keyList[0]
         self.keyRIGHT = keyList[1]
         self.keyUP = keyList[2]
@@ -136,6 +141,8 @@ class Hero:
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self):
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
+
         self.image = imgHero[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
         self.moveSpeed = MOVE_SPEED[self.rank]
@@ -173,7 +180,7 @@ class Hero:
 
         # map edge
         if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
-            print(self.rect.bottom, self.rect.top)
+
             self.rect.topleft = oldX, oldY
 
         if keys[self.keySHOT] and self.shotTimer == 0:
@@ -196,6 +203,8 @@ class Hero:
         else:
             self.shield = False
             sound_shield.stop()
+
+        #Timers
 
         if self.shotTimer > 0:
             self.shotTimer -= 1
@@ -345,14 +354,16 @@ class Princess:
         self.message_group_counter = 0
 
     def update(self):
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
+
         self.image = imgPrincess[self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
-
         oldX, oldY = self.rect.topleft
 
         # Activities
-        if self.activities == 0 and self.activity_timer < 101:
-            self.rect.x -= self.moveSpeed
+        if self.activities == 0 and self.activity_timer < 100:
+            if self.activity_timer % 4 == 0:
+                self.rect.x -= self.moveSpeed
             self.direct = 3
             self.image = imgPrincess[self.direct][self.count]
 
@@ -360,12 +371,14 @@ class Princess:
             self.image = imgPrincess[self.direct][0]
 
         if self.activities == 2 and self.activity_timer < 100:
-            self.rect.y += self.moveSpeed
+            if self.activity_timer % 4 == 0:
+                self.rect.y += self.moveSpeed
             self.direct = 2
             self.image = imgPrincess[self.direct][self.count]
 
         if self.activities == 3 and self.activity_timer < 100:
-            self.rect.x += self.moveSpeed
+            if self.activity_timer % 4 == 0:
+                self.rect.x += self.moveSpeed
             self.direct = 1
             self.image = imgPrincess[self.direct][self.count]
 
@@ -373,7 +386,8 @@ class Princess:
             self.image = imgPrincess[self.direct][0]
 
         if self.activities == 5 and self.activity_timer < 100:
-            self.rect.y -= self.moveSpeed
+            if self.activity_timer % 4 == 0:
+                self.rect.y -= self.moveSpeed
             self.direct = 0
             self.image = imgPrincess[self.direct][self.count]
         if self.activities == 6 and self.activity_timer < 100:
@@ -419,25 +433,38 @@ class Princess:
             self.hp -= value
             if self.hp <= 0:
                 objects.remove(self)
-                sound_finish.play()
+                sound_mob_death.play()
 
 class Mob(Princess):
     def __init__(self, px, py, direct, words, rank):
         super().__init__(px, py, direct, words)
-        self.rank = 0
-        objects.append(self)
+        self.rank = rank
         self.type = 'mob'
-        self.rect = pygame.Rect(px, py, TILE, TILE)
-        self.moveSpeed = MOVE_SPEED[self.rank] / 2
-        self.image = imgPrincess[self.direct][0]
-        self.rect = self.image.get_rect(center=self.rect.center)
-        self.activities = 0
-        self.activity_timer = 50
-        self.animationTimer = 20 / self.moveSpeed
+        self.rect = pygame.Rect(px, py, 17, 42)
+        self.moveSpeed = 1
         self.shield = False
         self.hp = MOB_HP[self.rank]
-        self.message_time_counter = 0
-        self.message_group_counter = 0
+        self.bulletSpeed = 2
+        self.bulletSize = MOB_BULLET_SIZE[self.rank]
+        self.bulletDistance = MOB_BULLET_DISTANCE[self.rank]
+        self.shotDelay = 15
+        self.bulletDamage = MOB_BULLET_DAMAGE[self.rank]
+        self.shotTimer = 0
+
+
+    def update(self):
+        super().update()
+
+        if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(abs(User.rect.center[1]) - abs(self.rect.center[1])) < 60 and self.shotTimer == 0:
+            dx = DIRECTS[self.direct][0] * self.bulletSpeed
+            dy = DIRECTS[self.direct][1] * self.bulletSpeed
+            if self.activity_timer % 10 == 0:
+                Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance, self.bulletSize)
+                self.shotTimer = self.shotDelay
+                sound_shot.play()
+        if self.shotTimer > 0:
+            self.shotTimer -= 1
+
 
 
 
