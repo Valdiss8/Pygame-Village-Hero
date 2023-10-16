@@ -134,8 +134,6 @@ sound_danger = pygame.mixer.Sound('sounds/danger.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 
-
-
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
 MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
@@ -512,7 +510,6 @@ class Mob(Princess):
         self.message_group_counter = 0
         super().update()
 
-
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(
                 abs(User.rect.center[1]) - abs(self.rect.center[1])) < 60 and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
@@ -524,15 +521,15 @@ class Mob(Princess):
                 sound_mob_shot.play()
 
 
-
 bullets = []
 objects = []
 User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
-Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'],['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'],[] ], 1)
-Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'],[] ], 2)
+Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
+                                  ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'], []], 1)
+Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'], []], 2)
 
 # for _ in range(150):
 #    while True:
