@@ -507,7 +507,8 @@ class Mob(Princess):
         self.shotTimer = 0
 
     def update(self):
-        self.message_group_counter = 0
+        # Making sure that mobs message not end, and they will not disappear
+        self.message_group_counter = -1
         super().update()
 
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(
@@ -528,8 +529,8 @@ User = Hero(10, 1, 100, 275, 0,
 animationTimer = 40 / MOVE_SPEED[User.rank]
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga'], []], 1)
-Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food'], []], 2)
+Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
+Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food']], 2)
 
 # for _ in range(150):
 #    while True:
