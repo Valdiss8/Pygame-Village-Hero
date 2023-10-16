@@ -470,9 +470,8 @@ class Princess:
                     sound_danger.play()
                 if self.message_group_counter == len(self.words):
                     objects.remove(self)
-                    for i in range(4):
+                    for i in range(6):
                         sound_map_level_1_upset.play()
-
                     Message(User, 'I need to help')
         if self.animationTimer > 0:
             self.animationTimer -= 1
