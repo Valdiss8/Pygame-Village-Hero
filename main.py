@@ -32,7 +32,7 @@ imgBangs = [
     pygame.image.load('images/bang/bang2.png'),
     pygame.image.load('images/bang/bang3.png')
 ]
-imgPrincess = [[
+imgPrincess = [[[
     pygame.image.load('images/sprites/princess/front_1.png'),
     pygame.image.load('images/sprites/princess/front_2.png'),
     pygame.image.load('images/sprites/princess/front_3.png')
@@ -53,6 +53,51 @@ imgPrincess = [[
         pygame.image.load('images/sprites/princess/left_2.png'),
         pygame.image.load('images/sprites/princess/left_3.png'),
     ]
+],
+[[
+    pygame.image.load('images/sprites/mob/level_1/front_1.png'),
+    pygame.image.load('images/sprites/mob/level_1/front_2.png'),
+    pygame.image.load('images/sprites/mob/level_1/front_3.png')
+],
+    [
+        pygame.image.load('images/sprites/mob/level_1/right_1.png'),
+        pygame.image.load('images/sprites/mob/level_1/right_2.png'),
+        pygame.image.load('images/sprites/mob/level_1/right_3.png')
+    ],
+    [
+        pygame.image.load('images/sprites/mob/level_1/back_1.png'),
+        pygame.image.load('images/sprites/mob/level_1/back_2.png'),
+        pygame.image.load('images/sprites/mob/level_1/back_3.png'),
+
+    ],
+    [
+        pygame.image.load('images/sprites/mob/level_1/left_1.png'),
+        pygame.image.load('images/sprites/mob/level_1/left_2.png'),
+        pygame.image.load('images/sprites/mob/level_1/left_3.png'),
+    ]
+],
+[[
+    pygame.image.load('images/sprites/mob/level_2/front_1.png'),
+    pygame.image.load('images/sprites/mob/level_2/front_2.png'),
+    pygame.image.load('images/sprites/mob/level_2/front_3.png')
+],
+    [
+        pygame.image.load('images/sprites/mob/level_2/right_1.png'),
+        pygame.image.load('images/sprites/mob/level_2/right_2.png'),
+        pygame.image.load('images/sprites/mob/level_2/right_3.png')
+    ],
+    [
+        pygame.image.load('images/sprites/mob/level_2/back_1.png'),
+        pygame.image.load('images/sprites/mob/level_2/back_2.png'),
+        pygame.image.load('images/sprites/mob/level_2/back_3.png'),
+
+    ],
+    [
+        pygame.image.load('images/sprites/mob/level_2/left_1.png'),
+        pygame.image.load('images/sprites/mob/level_2/left_2.png'),
+        pygame.image.load('images/sprites/mob/level_2/left_3.png'),
+    ]
+],
 ]
 
 imgHero = [[[
@@ -84,7 +129,7 @@ sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
 sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
 sound_mob_death = pygame.mixer.Sound('sounds/mob_death.mp3')
-sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot.wav')
+sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot_1.mp3')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 
@@ -334,15 +379,16 @@ class Message:
 
 
 class Princess:
-    def __init__(self, px, py, direct, words):
+    def __init__(self, px, py, direct, words, rank):
         objects.append(self)
         self.type = 'princess'
         self.count = 0
+        self.rank = rank
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
         self.moveSpeed = 1
         self.words = words
-        self.image = imgPrincess[self.direct][0]
+        self.image = imgPrincess[self.rank][self.direct][0]
 
         self.rect = self.image.get_rect(center=self.rect.center)
         self.activities = 0
@@ -356,7 +402,7 @@ class Princess:
     def update(self):
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
 
-        self.image = imgPrincess[self.direct][0]
+        self.image = imgPrincess[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
         oldX, oldY = self.rect.topleft
 
@@ -365,33 +411,33 @@ class Princess:
             if self.activity_timer % 4 == 0:
                 self.rect.x -= self.moveSpeed
             self.direct = 3
-            self.image = imgPrincess[self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 1 and self.activity_timer < 100:
-            self.image = imgPrincess[self.direct][0]
+            self.image = imgPrincess[self.rank][self.direct][0]
 
         if self.activities == 2 and self.activity_timer < 100:
             if self.activity_timer % 4 == 0:
                 self.rect.y += self.moveSpeed
             self.direct = 2
-            self.image = imgPrincess[self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 3 and self.activity_timer < 100:
             if self.activity_timer % 4 == 0:
                 self.rect.x += self.moveSpeed
             self.direct = 1
-            self.image = imgPrincess[self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 4 and self.activity_timer < 100:
-            self.image = imgPrincess[self.direct][0]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 5 and self.activity_timer < 100:
             if self.activity_timer % 4 == 0:
                 self.rect.y -= self.moveSpeed
             self.direct = 0
-            self.image = imgPrincess[self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
         if self.activities == 6 and self.activity_timer < 100:
-            self.image = imgPrincess[self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][self.count]
 
         # Collision
         for obj in objects:
@@ -437,7 +483,7 @@ class Princess:
 
 class Mob(Princess):
     def __init__(self, px, py, direct, words, rank):
-        super().__init__(px, py, direct, words)
+        super().__init__(px, py, direct, words, rank)
         self.rank = rank
         self.type = 'mob'
         self.rect = pygame.Rect(px, py, 17, 42)
@@ -447,7 +493,7 @@ class Mob(Princess):
         self.bulletSpeed = 2
         self.bulletSize = MOB_BULLET_SIZE[self.rank]
         self.bulletDistance = MOB_BULLET_DISTANCE[self.rank]
-        self.shotDelay = 15
+        self.shotDelay = 30
         self.bulletDamage = MOB_BULLET_DAMAGE[self.rank]
         self.shotTimer = 0
 
@@ -458,12 +504,14 @@ class Mob(Princess):
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(abs(User.rect.center[1]) - abs(self.rect.center[1])) < 60 and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
-            if self.activity_timer % 10 == 0:
+
+            if self.activity_timer % self.shotDelay == 0:
+
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance, self.bulletSize)
-                self.shotTimer = self.shotDelay
-                sound_shot.play()
-        if self.shotTimer > 0:
-            self.shotTimer -= 1
+
+                sound_mob_shot.play()
+
+
 
 
 
@@ -479,8 +527,9 @@ objects = []
 User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
-Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']])
-Mob(500, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+Mob(500, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 1)
+Mob(300, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 2)
 
 #for _ in range(150):
 #    while True:
