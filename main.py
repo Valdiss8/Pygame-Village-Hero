@@ -23,6 +23,8 @@ fontUI = pygame.font.Font(None, 30)
 pygame.display.update()
 
 """Images"""
+back_map = [pygame.image.load('images/map/map_level_1/back_1').convert()]
+
 imgBangs = [
     pygame.image.load('images/bang/bang1.png'),
     pygame.image.load('images/bang/bang2.png'),
@@ -294,6 +296,7 @@ while play:
         if event.type == pygame.QUIT:
             play = False
 
+    window.blit(back_map[0])
     keys = pygame.key.get_pressed()
 
 
@@ -301,7 +304,7 @@ while play:
 
 
 
-    window.fill('black')
+
     for bullet in bullets:
         bullet.update()
         bullet.draw()
