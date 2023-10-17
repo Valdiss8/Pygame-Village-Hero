@@ -985,7 +985,7 @@ objects = [
     [mob, User],
     [mob2, User, mob3, mob4, mob5, boss_1]
 ]
-bullets = [[], [], []]
+bullets = [[], [], [], []]
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
@@ -1027,12 +1027,9 @@ def menu(objects):
                     menu_game.switch(+1, 0)
                 elif event.key == pygame.K_SPACE:
                     menu_game.select()
-
         window.fill((0, 0, 0))
         menu_game.draw(window, 100, 100, 300, 300)
 
-        global keys
-        keys = pygame.key.get_pressed()
         pygame.display.update()
         clock.tick(FPS)
 
@@ -1104,7 +1101,7 @@ def scene2(objects):
 
 def scene_boss(objects):
     global scene_play
-    scene_play = -1
+    scene_play = 3
     play = True
     while play:
 
