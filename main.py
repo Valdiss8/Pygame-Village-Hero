@@ -353,14 +353,15 @@ class Block:
 
 
 class Message:
-    def __init__(self, parent, word):
+    def __init__(self, parent, word, color='black'):
         objects.append(self)
         self.type = 'message'
         self.bottom_right = parent.rect.topright
         self.timer = 0
         self.message_count = 0
         self.textlist = word
-        self.text = font_dialog.render(self.textlist[self.message_count], 1, 'black')
+        self.color = color
+        self.text = font_dialog.render(self.textlist[self.message_count], 1, self.color)
         self.image = img_message
         self.rect = self.image.get_rect(bottomright=self.bottom_right)
 
@@ -371,7 +372,7 @@ class Message:
             self.message_count += 1
             self.timer = 0
         if self.message_count < len(self.textlist):
-            self.text = font_dialog.render(self.textlist, 1, 'black')
+            self.text = font_dialog.render(self.textlist, 1, self.color)
         else:
             objects.remove(self)
 
@@ -467,10 +468,12 @@ class Princess:
                 if self.message_group_counter == 2:
                     sound_danger.play()
                 if self.message_group_counter == len(self.words):
+                    sound_danger.play()
                     objects.remove(self)
                     for i in range(6):
                         sound_map_level_1_upset.play()
-                    Message(User, 'I need to help')
+                    Message(self, 'Help me!', 'red')
+                    Message(User, 'I need to help', 'red')
 
         if self.animationTimer > 0:
             self.animationTimer -= 1
