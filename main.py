@@ -940,9 +940,9 @@ class Menu:
         self.option_surfaces[group].append(font_MENU.render(option, 0, 'red'))
         self.callbacks[group].append(callback)
 
-    def switch(self, direction):
-        self.current_group = max(0, min(self.current_group + direction, len(self.option_surfaces) - 1))
-        self.current_option_index = max(0, min(self.current_option_index + direction,
+    def switch(self, vertical_direction, horisontal_direction):
+        self.current_group = max(0, min(self.current_group + vertical_direction, len(self.option_surfaces) - 1))
+        self.current_option_index = max(0, min(self.current_option_index + horisontal_direction,
                                                len(self.option_surfaces[self.current_group]) - 1))
 
     def select(self):
@@ -957,8 +957,8 @@ class Menu:
                     pygame.draw.rect(surface, (0, 100, 0), option_rect )
                 surface.blit(option, option_rect)
 
-option_surfaces = [['EASY', 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
-callbacks = [['EASY', lambda: print('easy'), 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
+#option_surfaces = [['EASY', 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
+#callbacks = [['EASY', lambda: print('easy'), 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
 
 menu_game = Menu()
 menu_game.append_option('EASY', lambda: print('Easy'), 0)
@@ -1011,14 +1011,28 @@ def menu(objects):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+
                 play = False
                 switch_scene(None)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(scene1)
-                play = False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_g:
+                    switch_scene(scene1)
+                    play = False
+                if event.key == pygame.K_UP:
+                    menu_game.switch(0, -1)
+                if event.key == pygame.K_DOWN:
+                    menu_game.switch(0, +1)
+                if event.key == pygame.K_LEFT:
+                    menu_game.switch(-1, 0)
+                if event.key == pygame.K_RIGHT:
+                    menu_game.switch(+1, 0)
+                elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
+                    menu_game.select()
+
 
         window.fill((0, 0, 0))
-        menu_game.draw(window, 100, 100, 75, 75)
+        menu_game.draw(window, 100, 100, 300, 300)
         #window.blit(back_map[scene_play], (0, 0))
 
         pygame.display.update()
