@@ -123,14 +123,22 @@ imgHero = [[[
 ]]
 imgBrick = pygame.image.load('images/block_brick.png')
 
+imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
+              pygame.image.load('images/bonus/healing.png')]
+
 """Sounds"""
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
+sound_heavy_attack = pygame.mixer.Sound('sounds/heavy_attack.mp3')
+
+sound_super_attack = pygame.mixer.Sound('sounds/super_ball.mp3')
 sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
 sound_mob_death = pygame.mixer.Sound('sounds/mob_death.mp3')
 sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot_1.mp3')
 sound_danger = pygame.mixer.Sound('sounds/danger.mp3')
+sound_pickup_magic_scroll = pygame.mixer.Sound('sounds/pick_up_scroll.mp3')
+sound_pickup_healing = pygame.mixer.Sound('sounds/pick_up_healing.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 
@@ -142,12 +150,14 @@ BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
 BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
-SHIELD_LIMIT = [60, 100, 150, 200, 250, 300, 350, 400]
+SHIELD_LIMIT = [60, 60, 60, 70, 70, 70, 80, 80]
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
 MOB_HP = [1, 2, 3, 4, 5, 6, 7, 8]
 MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 130]
-MOB_BULLET_DAMAGE = [1, 1, 1, 1, 2, 2, 2, 2]
+MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 2]
+MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
 MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 2, 3, 4]
+SCROLLS_LIMIT = [10, 11, 12, 13, 14, 15, 16, 17]
 
 
 class Hero:
@@ -158,13 +168,13 @@ class Hero:
         objects.append(self)
         self.type = 'hero'
         self.rank = 0
-        if self.rank >= 7:
-            self.rank = 7
         self.count = 0
         self.bulletSize_count = 0
         self.rect = pygame.Rect(px, py, TILE, TILE)
         self.direct = direct
         self.hp = HP[self.rank]
+        self.scrolls = 0
+
         self.shield = False
         self.moveSpeed = MOVE_SPEED[self.rank]
         self.animationTimer = 20 / MOVE_SPEED[self.rank]
@@ -230,15 +240,25 @@ class Hero:
         if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.rect.topleft = oldX, oldY
 
+        # Regular attack
         if keys[self.keySHOT] and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
             Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
-                   self.bulletSize)
+                   self.bulletSize, 'blue')
             self.shotTimer = self.shotDelay
             sound_shot.play()
 
-        elif keys[self.keySHIELD] and self.shotTimer == 0:
+        # Heavy attack
+        if keys[self.keySHIELD] and keys[self.keySHOT] and self.shieldDelay - 5 > self.shotTimer > self.shotDelay - 10:
+            dx = DIRECTS[self.direct][0] * self.bulletSpeed
+            dy = DIRECTS[self.direct][1] * self.bulletSpeed
+            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage * 2, self.bulletDistance,
+                   self.bulletSize * 3, 'yellow')
+            self.shotTimer = self.shotDelay * 3
+            sound_heavy_attack.play()
+
+        if keys[self.keySHIELD] and self.shotTimer == 0:
             self.shieldTimer = self.shieldDelay
             self.shotTimer = self.shotDelay + self.shieldDelay
 
@@ -250,6 +270,16 @@ class Hero:
         else:
             self.shield = False
             sound_shield.stop()
+
+        # Super ball
+        if keys[self.keySUPER] and self.shotTimer == 0 and self.scrolls:
+            dx = DIRECTS[self.direct][0] * self.bulletSpeed
+            dy = DIRECTS[self.direct][1] * self.bulletSpeed
+            Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage * 3, self.bulletDistance * 3,
+                   self.bulletSize * 3, 'red')
+            self.shotTimer = self.shotDelay
+            sound_super_attack.play()
+            self.scrolls -= 1
 
         # Timers
 
@@ -264,12 +294,9 @@ class Hero:
 
         else:
             self.animationTimer = 20 / MOVE_SPEED[User.rank]
-            User.count += 1
-            User.bulletSize_count += 1
+            self.count += 1
             if User.count == 3:
                 User.count = 0
-            if User.bulletSize_count == 8:
-                User.bulletSize_count = 8
 
     def draw(self):
         window.blit(self.image, self.rect)
@@ -279,11 +306,12 @@ class Hero:
             self.hp -= value
             if self.hp <= 0:
                 objects.remove(self)
+
                 sound_finish.play()
 
 
 class Bullet:
-    def __init__(self, parent, px, py, dx, dy, damage, distance, size):
+    def __init__(self, parent, px, py, dx, dy, damage, distance, size, collor='black'):
         bullets.append(self)
         self.parent = parent
         self.px, self.py = px, py
@@ -291,17 +319,18 @@ class Bullet:
         self.damage = damage
         self.distance = distance
         self.size = size
+        self.color = collor
 
     def update(self):
         self.px += self.dx
         self.py += self.dy
 
-        if abs(self.px - self.parent.rect.x) > self.parent.bulletDistance or abs(
-                self.py - self.parent.rect.y) > self.parent.bulletDistance:
+        if abs(self.px - self.parent.rect.x) > self.distance or abs(
+                self.py - self.parent.rect.y) > self.distance:
             bullets.remove(self)
         else:
             for obj in objects:
-                if obj != self.parent and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
+                if obj != self.parent and obj.type != self.parent.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
                         self.px,
                         self.py):
                     obj.damage(self.damage)
@@ -311,7 +340,7 @@ class Bullet:
                     break
 
     def draw(self):
-        pygame.draw.circle(window, 'yellow', (self.px, self.py), self.size)
+        pygame.draw.circle(window, self.color, (self.px, self.py), self.size)
 
 
 class Bang:
@@ -331,6 +360,41 @@ class Bang:
         image = imgBangs[int(self.frame)]
         rect = image.get_rect(center=(self.px, self.py))
         window.blit(image, rect)
+
+
+class Bonus:
+    def __init__(self, parent, bonusNum):
+        objects.append(self)
+        self.type = 'bonus'
+        self.bonusNum = bonusNum
+        self.image = imgBonuses[self.bonusNum]
+        self.rect = self.image.get_rect(center=parent.rect.center)
+        self.timer = 600
+
+    def update(self):
+        if self.timer > 0:
+            self.timer -= 1
+        else:
+            objects.remove(self)
+
+        for obj in objects:
+            if obj.type == 'hero' and self.rect.colliderect(obj.rect):
+                if self.bonusNum == 0:
+                    if obj.scrolls < SCROLLS_LIMIT[obj.rank]:
+                        obj.scrolls += 1
+                    objects.remove(self)
+                    sound_pickup_magic_scroll.play()
+                    break
+                elif self.bonusNum == 1:
+                    if obj.hp < HP[obj.rank]:
+                        obj.hp += 1
+                    objects.remove(self)
+                    sound_pickup_healing.play()
+                    break
+
+    def draw(self):
+        if self.timer % 30 < 15:
+            window.blit(self.image, self.rect)
 
 
 class Block:
@@ -392,7 +456,6 @@ class Princess:
         self.moveSpeed = 1
         self.words = words
         self.image = imgPrincess[self.rank][self.direct][0]
-
         self.rect = self.image.get_rect(center=self.rect.center)
         self.activities = 0
         self.activity_timer = 30
@@ -467,8 +530,9 @@ class Princess:
                 self.message_time_counter = 0
                 if self.message_group_counter == 2:
                     sound_danger.play()
+                    Mob(self.rect.center[0]+30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
+                    Mob(self.rect.center[0]-30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
                 if self.message_group_counter == len(self.words):
-                    sound_danger.play()
                     objects.remove(self)
                     for i in range(6):
                         sound_map_level_1_upset.play()
@@ -491,6 +555,9 @@ class Princess:
             self.hp -= value
             if self.hp <= 0:
                 objects.remove(self)
+                bonus_probability = randint(1, 4)
+                if bonus_probability < 2:
+                    Bonus(self, bonus_probability)
                 sound_mob_death.play()
 
 
@@ -506,7 +573,7 @@ class Mob(Princess):
         self.bulletSpeed = 2
         self.bulletSize = MOB_BULLET_SIZE[self.rank]
         self.bulletDistance = MOB_BULLET_DISTANCE[self.rank]
-        self.shotDelay = 30
+        self.shotDelay = MOB_SHOT_DELAY[self.rank]
         self.bulletDamage = MOB_BULLET_DAMAGE[self.rank]
         self.shotTimer = 0
 
@@ -534,7 +601,8 @@ animationTimer = 40 / MOVE_SPEED[User.rank]
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
 Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
-Mob(300, 500, 0, [['', 'GRR', 'Hungry', 'Food']], 2)
+Mob(300, 500, 0, [['', 'Hungry', 'GRR', 'Food']], 2)
+Mob(400, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
 
 # for _ in range(150):
 #    while True:
