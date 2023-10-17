@@ -121,6 +121,26 @@ imgHero = [[[
         pygame.image.load('images/sprites/hero_level_1/left_1.png'),
         pygame.image.load('images/sprites/hero_level_1/left_2.png'),
         pygame.image.load('images/sprites/hero_level_1/left_3.png'),
+    ]],
+    [[
+    pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
+    pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
+    pygame.image.load('images/sprites/hero_level_1/forward_3.png')
+],
+    [
+        pygame.image.load('images/sprites/hero_level_1/right_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/right_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/right_3.png')
+    ],
+    [
+        pygame.image.load('images/sprites/hero_level_1/back_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/back_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/back_3.png'),
+    ],
+    [
+        pygame.image.load('images/sprites/hero_level_1/left_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/left_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/left_3.png'),
     ]
 ]]
 imgBrick = pygame.image.load('images/block_brick.png')
@@ -145,7 +165,7 @@ sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
-
+EXPERIENCE = [7, 10, 13, 15, 19, 25, 32, 40]
 MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_SPEED = [4, 5, 6, 7, 8, 9, 10, 11]
 BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
@@ -173,14 +193,23 @@ class UI:
         for obj in objects:
             # Hero life and scrolls
             if obj.type == 'hero':
+                # life
                 window.blit(imgBonuses[1], (5, 5, 32, 32))
-                window.blit(imgBonuses[0], (50, 5, 32, 32))
                 text_hp = fontUI.render(str(obj.hp), 0, 'red')
+                rect_hp = text_hp.get_rect(center=(37, 16))
+                window.blit(text_hp, rect_hp)
+                # scrolls
+                window.blit(imgBonuses[0], (50, 5, 32, 32))
                 text_scrolls = fontUI.render(str(obj.scrolls), 0, 'blue')
-                rect = text_hp.get_rect(center=(37, 16))
-                rect1 = text_scrolls.get_rect(center=(92, 16))
-                window.blit(text_hp, rect)
-                window.blit(text_scrolls, rect1)
+                rect_scrolls = text_scrolls.get_rect(center=(92, 16))
+                window.blit(text_scrolls, rect_scrolls)
+                # level
+                text_lvl = fontUI.render(str(obj.rank), 0, 'blue')
+                text_level = fontUI.render('LEVEL', 0, 'red')
+                rect_lvl = text_scrolls.get_rect(center=(190, 14))
+                window.blit(text_level, (110, 5, 32, 32))
+                window.blit(text_lvl, rect_lvl)
+
             # Mob life
             if obj.type == 'mob':
                 text_hp = font_MOB_life.render(str(obj.hp), 0, 'red')
@@ -202,7 +231,7 @@ class Hero:
         self.direct = direct
         self.hp = HP[self.rank]
         self.scrolls = 0
-
+        self.xp = 0
         self.shield = False
         self.moveSpeed = MOVE_SPEED[self.rank]
         self.animationTimer = 20 / MOVE_SPEED[self.rank]
@@ -497,7 +526,6 @@ class Princess:
 
     def update(self):
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
-
         self.image = imgPrincess[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
         oldX, oldY = self.rect.topleft
@@ -587,6 +615,12 @@ class Princess:
                 objects.remove(self)
                 if self.bonus_probability < 2:
                     Bonus(self, self.bonus_probability)
+                if User.rank < len(EXPERIENCE):
+                    User.xp += self.rank
+                    if User.xp >= EXPERIENCE[User.rank]:
+                        User.rank += 1
+                        print(len(EXPERIENCE), User.rank)
+
                 sound_mob_death.play()
 
 
