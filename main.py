@@ -431,7 +431,7 @@ class Princess:
             self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 4 and self.activity_timer < 100:
-            self.image = imgPrincess[self.rank][self.direct][self.count]
+            self.image = imgPrincess[self.rank][self.direct][0]
 
         if self.activities == 5 and self.activity_timer < 100:
             if self.activity_timer % 4 == 0:
@@ -471,6 +471,7 @@ class Princess:
                     for i in range(6):
                         sound_map_level_1_upset.play()
                     Message(User, 'I need to help')
+
         if self.animationTimer > 0:
             self.animationTimer -= 1
         else:
