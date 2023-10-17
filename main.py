@@ -107,7 +107,7 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_2/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/mob/level_3/front_1.png'),
         pygame.image.load('images/sprites/mob/level_3/front_2.png'),
         pygame.image.load('images/sprites/mob/level_3/front_3.png')
@@ -129,7 +129,7 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_3/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/mob/level_4/front_1.png'),
         pygame.image.load('images/sprites/mob/level_4/front_2.png'),
         pygame.image.load('images/sprites/mob/level_4/front_3.png')
@@ -151,7 +151,7 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_4/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/mob/level_5/front_1.png'),
         pygame.image.load('images/sprites/mob/level_5/front_2.png'),
         pygame.image.load('images/sprites/mob/level_5/front_3.png')
@@ -173,7 +173,7 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_5/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/mob/level_5/front_1.png'),
         pygame.image.load('images/sprites/mob/level_5/front_2.png'),
         pygame.image.load('images/sprites/mob/level_5/front_3.png')
@@ -195,7 +195,7 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_5/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/mob/boss/front_1.png'),
         pygame.image.load('images/sprites/mob/boss/front_2.png'),
         pygame.image.load('images/sprites/mob/boss/front_3.png')
@@ -260,7 +260,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_1/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_1/forward_3.png')
@@ -281,7 +281,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_1/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_4/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_4/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_4/forward_3.png')
@@ -302,7 +302,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_4/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_4/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_4/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_4/forward_3.png')
@@ -323,7 +323,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_4/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_6/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_3.png')
@@ -344,7 +344,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_6/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_6/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_3.png')
@@ -365,7 +365,7 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_6/left_3.png'),
         ]
     ],
-[[
+    [[
         pygame.image.load('images/sprites/hero_level_6/forward_1.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_2.png'),
         pygame.image.load('images/sprites/hero_level_6/forward_3.png')
@@ -386,9 +386,6 @@ imgHero = [[[
             pygame.image.load('images/sprites/hero_level_6/left_3.png'),
         ]
     ],
-
-
-
 
 ]
 imgBrick = pygame.image.load('images/block_brick.png')
@@ -904,6 +901,7 @@ class Mob(Princess):
                        self.bulletSize)
                 sound_mob_shot.play()
 
+
 class Boss(Mob):
     def update(self):
         super().update()
@@ -930,7 +928,6 @@ class Boss(Mob):
                 sound_mob_shot.play()
 
 
-
 # Objects in different scenes
 ui = UI()
 mob = Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
@@ -955,27 +952,47 @@ bullets = [[], [], []]
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
-# for _ in range(150):
-#    while True:
-#        x = randint(0, WIDTH // TILE - 1) * TILE
-#        y = randint(1, HEIGHT // TILE - 1) * TILE
-#        rect = pygame.Rect(x, y, TILE, TILE)
-#        fined = False
-#        for obj in objects:
-#            if rect.colliderect(obj.rect):
-#                fined = True
-#
-#        if not fined:
-#            break
-#    Block(x, y, TILE)
 
-# global variables for scenes
 current_scene = None
+
 
 # Main proces with scenes
 def switch_scene(scene):
     global current_scene
     current_scene = scene
+
+
+def menu(menu_objects):
+    global scene_play
+    scene_play = 0
+
+    play = True
+    while play:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                play = False
+                switch_scene(None)
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                switch_scene(scene1)
+                play = False
+        global keys
+        keys = pygame.key.get_pressed()
+        window.blit(back_map[scene_play], (0, 0))
+
+        for bullet in bullets[scene_play]:
+            bullet.update()
+            bullet.draw()
+
+        for obj in objects[scene_play]:
+            obj.update()
+            obj.draw()
+        ui.update()
+        ui.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def scene1(objects):
