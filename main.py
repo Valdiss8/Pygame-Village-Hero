@@ -3,8 +3,7 @@ from random import randint
 
 pygame.init()
 '''Interface'''
-# Scene choose
-scene_play = 1
+
 
 WIDTH, HEIGHT = 1200, 780
 FPS = 60
@@ -17,9 +16,10 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('Village Hero')
 pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
 fontUI = pygame.font.Font(None, 30)
-font_dialog = pygame.font.SysFont('microsofttaile', 15)
+font_dialog = pygame.font.Font(None, 15)
 font_UI = pygame.font.Font(None, 30)
 font_MOB_life = pygame.font.Font(None, 19)
+font_MENU = pygame.font.Font(None, 60)
 
 """Surface"""
 # surf = pygame.Surface((2000, 2000))
@@ -928,6 +928,46 @@ class Boss(Mob):
                 sound_mob_shot.play()
 
 
+# Menu
+class Menu:
+    def __init__(self): # option_surfaces, callbacks,
+        self.option_surfaces = [[], []]
+        self.callbacks = [[], []]
+        self.current_group = 0
+        self.current_option_index = 0
+
+    def append_option(self, option, callback, group):
+        self.option_surfaces[group].append(font_MENU.render(option, 0, 'red'))
+        self.callbacks[group].append(callback)
+
+    def switch(self, direction):
+        self.current_group = max(0, min(self.current_group + direction, len(self.option_surfaces) - 1))
+        self.current_option_index = max(0, min(self.current_option_index + direction,
+                                               len(self.option_surfaces[self.current_group]) - 1))
+
+    def select(self):
+        self.callbacks[self.current_group][self.current_option_index]()
+
+    def draw(self, surface, x, y, option_group_padding, options_surfaces_padding):
+        for i, group in enumerate(self.option_surfaces):
+            for j, option in enumerate(self.option_surfaces[i]):
+                option_rect = option.get_rect()
+                option_rect.topleft = (x + i * option_group_padding, y + j * options_surfaces_padding)
+                if i == self.current_group and j == self.current_option_index:
+                    pygame.draw.rect(surface, (0, 100, 0), option_rect )
+                surface.blit(option, option_rect)
+
+option_surfaces = [['EASY', 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
+callbacks = [['EASY', lambda: print('easy'), 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
+
+menu_game = Menu()
+menu_game.append_option('EASY', lambda: print('Easy'), 0)
+menu_game.append_option('MEDIUM', lambda: print('MEDIUM'), 0)
+menu_game.append_option('HARD', lambda: print('hard'), 0)
+menu_game.append_option('FAST', lambda: print('FAST'), 1)
+menu_game.append_option('BALANCED', lambda: print('BALANCED'), 1)
+menu_game.append_option('STRONG', lambda: print('STRONG'), 1)
+
 # Objects in different scenes
 ui = UI()
 mob = Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
@@ -943,7 +983,7 @@ Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good
 boss_1 = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
-    [mob],
+    [mob, menu_game],
     [],
     [mob, User],
     [mob2, User, mob3, mob4, mob5, boss_1]
@@ -952,17 +992,17 @@ bullets = [[], [], []]
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
-
 current_scene = None
-
+# Scene choose
+scene_play = 0
 
 # Main proces with scenes
 def switch_scene(scene):
     global current_scene
-    current_scene = scene
+    current_scene = menu
 
 
-def menu(menu_objects):
+def menu(objects):
     global scene_play
     scene_play = 0
 
@@ -973,23 +1013,13 @@ def menu(menu_objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
-
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 switch_scene(scene1)
                 play = False
-        global keys
-        keys = pygame.key.get_pressed()
-        window.blit(back_map[scene_play], (0, 0))
 
-        for bullet in bullets[scene_play]:
-            bullet.update()
-            bullet.draw()
-
-        for obj in objects[scene_play]:
-            obj.update()
-            obj.draw()
-        ui.update()
-        ui.draw()
+        window.fill((0, 0, 0))
+        menu_game.draw(window, 100, 100, 75, 75)
+        #window.blit(back_map[scene_play], (0, 0))
 
         pygame.display.update()
         clock.tick(FPS)
@@ -1071,7 +1101,7 @@ def scene_boss(objects):
                 play = False
                 switch_scene(None)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(scene1)
+                switch_scene(menu)
                 play = False
 
         window.blit(back_map[scene_play], (0, 0))
