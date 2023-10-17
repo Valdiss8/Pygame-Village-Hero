@@ -3,6 +3,9 @@ from random import randint
 
 pygame.init()
 '''Interface'''
+#Scene choose
+scene_play = 1
+
 
 WIDTH, HEIGHT = 1200, 780
 FPS = 60
@@ -26,7 +29,12 @@ font_MOB_life = pygame.font.Font(None, 19)
 pygame.display.update()
 
 """Images"""
-back_map = [pygame.image.load('images/map/map_level_1/back_1.jpg').convert()]
+back_map = [pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
+            pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
+            pygame.image.load('images/map/map_level_2/back_1.jpg').convert(),
+            pygame.image.load('images/map/map_level_boss/back_1.jpg').convert(),
+            pygame.image.load('images/map/map_level_1/back_1.jpg').convert()
+            ]
 img_message = pygame.image.load('images/message_2.png')
 
 imgBangs = [
@@ -123,26 +131,26 @@ imgHero = [[[
         pygame.image.load('images/sprites/hero_level_1/left_3.png'),
     ]],
     [[
-    pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
-    pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
-    pygame.image.load('images/sprites/hero_level_1/forward_3.png')
-],
-    [
-        pygame.image.load('images/sprites/hero_level_1/right_1.png'),
-        pygame.image.load('images/sprites/hero_level_1/right_2.png'),
-        pygame.image.load('images/sprites/hero_level_1/right_3.png')
+        pygame.image.load('images/sprites/hero_level_1/forward_1.png'),
+        pygame.image.load('images/sprites/hero_level_1/forward_2.png'),
+        pygame.image.load('images/sprites/hero_level_1/forward_3.png')
     ],
-    [
-        pygame.image.load('images/sprites/hero_level_1/back_1.png'),
-        pygame.image.load('images/sprites/hero_level_1/back_2.png'),
-        pygame.image.load('images/sprites/hero_level_1/back_3.png'),
-    ],
-    [
-        pygame.image.load('images/sprites/hero_level_1/left_1.png'),
-        pygame.image.load('images/sprites/hero_level_1/left_2.png'),
-        pygame.image.load('images/sprites/hero_level_1/left_3.png'),
-    ]
-]]
+        [
+            pygame.image.load('images/sprites/hero_level_1/right_1.png'),
+            pygame.image.load('images/sprites/hero_level_1/right_2.png'),
+            pygame.image.load('images/sprites/hero_level_1/right_3.png')
+        ],
+        [
+            pygame.image.load('images/sprites/hero_level_1/back_1.png'),
+            pygame.image.load('images/sprites/hero_level_1/back_2.png'),
+            pygame.image.load('images/sprites/hero_level_1/back_3.png'),
+        ],
+        [
+            pygame.image.load('images/sprites/hero_level_1/left_1.png'),
+            pygame.image.load('images/sprites/hero_level_1/left_2.png'),
+            pygame.image.load('images/sprites/hero_level_1/left_3.png'),
+        ]
+    ]]
 imgBrick = pygame.image.load('images/block_brick.png')
 
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
@@ -190,7 +198,7 @@ class UI:
         pass
 
     def draw(self):
-        for obj in objects:
+        for obj in objects[scene_play]:
             # Hero life and scrolls
             if obj.type == 'hero':
                 # life
@@ -222,7 +230,8 @@ class Hero:
 
     def __init__(self, hp, damage, px, py, direct, keyList):
 
-        objects.append(self)
+        objects[scene_play].append(self)
+
         self.type = 'hero'
         self.rank = 0
         self.count = 0
@@ -288,7 +297,7 @@ class Hero:
             self.direct = 2
             self.image = imgHero[self.rank][self.direct][self.count]
         # collision
-        for obj in objects:
+        for obj in objects[scene_play]:
             if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
                     obj.rect):
                 self.rect.topleft = oldX, oldY
@@ -362,14 +371,14 @@ class Hero:
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
-                objects.remove(self)
+                objects[scene_play].remove(self)
 
                 sound_finish.play()
 
 
 class Bullet:
     def __init__(self, parent, px, py, dx, dy, damage, distance, size, collor='black'):
-        bullets.append(self)
+        bullets[scene_play].append(self)
         self.parent = parent
         self.px, self.py = px, py
         self.dx, self.dy = dx, dy
@@ -384,14 +393,14 @@ class Bullet:
 
         if abs(self.px - self.parent.rect.x) > self.distance or abs(
                 self.py - self.parent.rect.y) > self.distance:
-            bullets.remove(self)
+            bullets[scene_play].remove(self)
         else:
-            for obj in objects:
+            for obj in objects[scene_play]:
                 if obj != self.parent and obj.type != self.parent.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
                         self.px,
                         self.py):
                     obj.damage(self.damage)
-                    bullets.remove(self)
+                    bullets[scene_play].remove(self)
                     Bang(self.px, self.py)
                     sound_dest.play()
                     break
@@ -402,7 +411,7 @@ class Bullet:
 
 class Bang:
     def __init__(self, px, py):
-        objects.append(self)
+        objects[scene_play].append(self)
         self.type = 'bang'
 
         self.px, self.py = px, py
@@ -411,7 +420,7 @@ class Bang:
     def update(self):
         self.frame += 0.3
         if self.frame >= 2:
-            objects.remove(self)
+            objects[scene_play].remove(self)
 
     def draw(self):
         image = imgBangs[int(self.frame)]
@@ -421,7 +430,7 @@ class Bang:
 
 class Bonus:
     def __init__(self, parent, bonusNum):
-        objects.append(self)
+        objects[scene_play].append(self)
         self.type = 'bonus'
         self.bonusNum = bonusNum
         self.image = imgBonuses[self.bonusNum]
@@ -432,20 +441,20 @@ class Bonus:
         if self.timer > 0:
             self.timer -= 1
         else:
-            objects.remove(self)
+            objects[scene_play].remove(self)
 
-        for obj in objects:
+        for obj in objects[scene_play]:
             if obj.type == 'hero' and self.rect.colliderect(obj.rect):
                 if self.bonusNum == 0:
                     if obj.scrolls < SCROLLS_LIMIT[obj.rank]:
                         obj.scrolls += 1
-                    objects.remove(self)
+                    objects[scene_play].remove(self)
                     sound_pickup_magic_scroll.play()
                     break
                 elif self.bonusNum == 1:
                     if obj.hp < HP[obj.rank]:
                         obj.hp += 1
-                    objects.remove(self)
+                    objects[scene_play].remove(self)
                     sound_pickup_healing.play()
                     break
 
@@ -456,7 +465,7 @@ class Bonus:
 
 class Block:
     def __init__(self, px, py, size):
-        objects.append(self)
+        objects[scene_play].append(self)
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 1
@@ -470,12 +479,12 @@ class Block:
     def damage(self, value):
         self.hp -= value
         if self.hp <= 0:
-            objects.remove(self)
+            objects[scene_play].remove(self)
 
 
 class Message:
     def __init__(self, parent, word, color='black'):
-        objects.append(self)
+        objects[scene_play].append(self)
         self.type = 'message'
         self.bottom_right = parent.rect.topright
         self.timer = 0
@@ -495,7 +504,7 @@ class Message:
         if self.message_count < len(self.textlist):
             self.text = font_dialog.render(self.textlist, 1, self.color)
         else:
-            objects.remove(self)
+            objects[scene_play].remove(self)
 
     def draw(self):
         self.rect = self.image.get_rect(bottomright=self.bottom_right)
@@ -504,7 +513,7 @@ class Message:
 
 class Princess:
     def __init__(self, px, py, direct, words, rank):
-        objects.append(self)
+        objects[scene_play].append(self)
         self.type = 'princess'
         self.count = 0
         self.rank = rank
@@ -564,7 +573,7 @@ class Princess:
             self.image = imgPrincess[self.rank][self.direct][self.count]
 
         # Collision
-        for obj in objects:
+        for obj in objects[scene_play]:
             if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
                     obj.rect):
                 self.rect.topleft = oldX, oldY
@@ -591,7 +600,7 @@ class Princess:
                     Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
                     Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
                 if self.message_group_counter == len(self.words):
-                    objects.remove(self)
+                    objects[scene_play].remove(self)
                     for i in range(6):
                         sound_map_level_1_upset.play()
                     Message(self, 'Help me!', 'red')
@@ -612,7 +621,7 @@ class Princess:
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
-                objects.remove(self)
+                objects[scene_play].remove(self)
                 if self.bonus_probability < 2:
                     Bonus(self, self.bonus_probability)
                 if User.rank < len(EXPERIENCE):
@@ -656,8 +665,9 @@ class Mob(Princess):
                 sound_mob_shot.play()
 
 
-bullets = []
-objects = []
+# Objects in different scenes
+objects = [[], [], []]
+bullets = [[], [], []]
 User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 animationTimer = 40 / MOVE_SPEED[User.rank]
@@ -685,28 +695,116 @@ ui = UI()
 #            break
 #    Block(x, y, TILE)
 
-play = True
+current_scene = None
+scene_play = 1
 
-while play:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            play = False
+def switch_scene(scene):
+    global current_scene
+    current_scene = scene
 
-    window.blit(back_map[0], (0, 0))
-    keys = pygame.key.get_pressed()
 
-    for bullet in bullets:
-        bullet.update()
-        bullet.draw()
+def scene1():
+    global scene_play
+    scene_play = 1
+    play = True
+    while play:
 
-    for obj in objects:
-        obj.update()
-        obj.draw()
-    ui.update()
-    ui.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                play = False
+                switch_scene(None)
 
-    pygame.display.update()
-    clock.tick(FPS)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                switch_scene(scene2)
+                play = False
+        global keys
+        keys = pygame.key.get_pressed()
+        window.blit(back_map[1], (0, 0))
+
+        for bullet in bullets[scene_play]:
+            bullet.update()
+            bullet.draw()
+
+        for obj in objects[scene_play]:
+            obj.update()
+            obj.draw()
+        ui.update()
+        ui.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def scene2():
+    global scene_play
+    scene_play = 2
+    play = True
+    while play:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                play = False
+                switch_scene(None)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                switch_scene(scene_boss)
+                play = False
+
+        window.blit(back_map[2], (0, 0))
+        global keys
+        keys = pygame.key.get_pressed()
+
+        for bullet in bullets[scene_play]:
+            bullet.update()
+            bullet.draw()
+
+        for obj in objects[scene_play]:
+            obj.update()
+            obj.draw()
+        ui.update()
+        ui.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def scene_boss():
+    global scene_play
+    scene_play = -1
+    play = True
+    while play:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                play = False
+                switch_scene(None)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                switch_scene(scene1)
+                play = False
+
+        window.blit(back_map[scene_play], (0, 0))
+        global keys
+        keys = pygame.key.get_pressed()
+
+        for bullet in bullets[scene_play]:
+            bullet.update()
+            bullet.draw()
+
+        for obj in objects[scene_play]:
+            obj.update()
+            obj.draw()
+        ui.update()
+        ui.draw()
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+# Switch scenes
+switch_scene(scene1)
+
+# Play scene
+while current_scene is not None:
+    current_scene()
 
 pygame.quit()
