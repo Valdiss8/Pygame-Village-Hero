@@ -7,6 +7,7 @@ pygame.init()
 scene_play = 1
 
 
+
 WIDTH, HEIGHT = 1200, 780
 FPS = 60
 TILE = 32
@@ -33,7 +34,7 @@ back_map = [pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
             pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
             pygame.image.load('images/map/map_level_2/back_1.jpg').convert(),
             pygame.image.load('images/map/map_level_boss/back_1.jpg').convert(),
-            pygame.image.load('images/map/map_level_1/back_1.jpg').convert()
+            pygame.image.load('images/map/map_level_boss/back_1.jpg').convert()
             ]
 img_message = pygame.image.load('images/message_2.png')
 
@@ -513,7 +514,7 @@ class Message:
 
 class Princess:
     def __init__(self, px, py, direct, words, rank):
-        objects[scene_play].append(self)
+        #objects[scene_play].append(self)
         self.type = 'princess'
         self.count = 0
         self.rank = rank
@@ -666,7 +667,10 @@ class Mob(Princess):
 
 
 # Objects in different scenes
-objects = [[], [], []]
+mob = Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
+objects = [[Mob(500, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 1)], [Mob(500, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 1)], [mob
+
+]]
 bullets = [[], [], []]
 User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
@@ -699,14 +703,16 @@ current_scene = None
 scene_play = 1
 
 
+
 def switch_scene(scene):
     global current_scene
     current_scene = scene
 
 
-def scene1():
+def scene1(objects):
     global scene_play
     scene_play = 1
+
     play = True
     while play:
 
@@ -720,7 +726,7 @@ def scene1():
                 play = False
         global keys
         keys = pygame.key.get_pressed()
-        window.blit(back_map[1], (0, 0))
+        window.blit(back_map[scene_play], (0, 0))
 
         for bullet in bullets[scene_play]:
             bullet.update()
@@ -736,7 +742,7 @@ def scene1():
         clock.tick(FPS)
 
 
-def scene2():
+def scene2(objects):
     global scene_play
     scene_play = 2
     play = True
@@ -750,7 +756,7 @@ def scene2():
                 switch_scene(scene_boss)
                 play = False
 
-        window.blit(back_map[2], (0, 0))
+        window.blit(back_map[scene_play], (0, 0))
         global keys
         keys = pygame.key.get_pressed()
 
@@ -768,7 +774,7 @@ def scene2():
         clock.tick(FPS)
 
 
-def scene_boss():
+def scene_boss(objects):
     global scene_play
     scene_play = -1
     play = True
@@ -805,6 +811,6 @@ switch_scene(scene1)
 
 # Play scene
 while current_scene is not None:
-    current_scene()
+    current_scene(objects)
 
 pygame.quit()
