@@ -957,8 +957,6 @@ class Menu:
                     pygame.draw.rect(surface, (0, 100, 0), option_rect )
                 surface.blit(option, option_rect)
 
-#option_surfaces = [['EASY', 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
-#callbacks = [['EASY', lambda: print('easy'), 'MEDIUM', 'HARD'], ['FAST', 'BALANCED', 'STRONG']]
 
 menu_game = Menu()
 menu_game.append_option('EASY', lambda: print('Easy'), 0)
@@ -1015,7 +1013,7 @@ def menu(objects):
                 play = False
                 switch_scene(None)
 
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g:
                     switch_scene(scene1)
                     play = False
@@ -1027,7 +1025,7 @@ def menu(objects):
                     menu_game.switch(-1, 0)
                 if event.key == pygame.K_RIGHT:
                     menu_game.switch(+1, 0)
-                elif event.key == pygame.K_KP_ENTER or event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE:
                     menu_game.select()
 
 
