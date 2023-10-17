@@ -422,11 +422,11 @@ BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 60, 60, 70, 70, 70, 80, 80]
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
-MOB_HP = [1, 2, 3, 4, 5, 6, 7, 8]
-MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 130]
-MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 2]
+MOB_HP = [1, 4, 7, 10, 15, 25, 35, 50]
+MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 150]
+MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 3]
 MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
-MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 2, 3, 4]
+MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 3, 3, 4]
 SCROLLS_LIMIT = [10, 11, 12, 13, 14, 15, 16, 17]
 
 
@@ -909,13 +909,23 @@ class Boss(Mob):
         super().update()
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < self.bulletDistance and abs(
                 abs(User.rect.center[1]) - abs(self.rect.center[1])) < self.bulletDistance and self.shotTimer == 0:
-            print(User.rect.center[0], self.rect.center[0])
-            print(User.rect.center[1], self.rect.center[1])
+
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
+            print(DIRECTS[self.direct][0], DIRECTS[self.direct][1])
 
             if self.activity_timer % self.shotDelay == 0:
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                Bullet(self, self.rect.centerx, self.rect.centery, -1, -1, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                Bullet(self, self.rect.centerx, self.rect.centery, -1, 0, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                Bullet(self, self.rect.centerx, self.rect.centery, -1, 1, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                Bullet(self, self.rect.centerx, self.rect.centery, 0, -1, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                Bullet(self, self.rect.centerx, self.rect.centery, 0, 1, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
                 sound_mob_shot.play()
 
@@ -933,7 +943,7 @@ User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-boss_1 = Boss(600, 300, 0, [['', 'She', 'is', 'mine']], 7)
+boss_1 = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [mob],
