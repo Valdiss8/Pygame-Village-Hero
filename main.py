@@ -4,7 +4,6 @@ from random import randint
 pygame.init()
 '''Interface'''
 
-
 WIDTH, HEIGHT = 1200, 780
 FPS = 60
 TILE = 32
@@ -927,9 +926,10 @@ class Boss(Mob):
                        self.bulletSize)
                 sound_mob_shot.play()
 
+
 # Menu
 class Menu:
-    def __init__(self): # option_surfaces, callbacks,
+    def __init__(self):  # option_surfaces, callbacks,
         self.option_surfaces = [[], []]
         self.callbacks = [[], []]
         self.current_group = 0
@@ -953,7 +953,7 @@ class Menu:
                 option_rect = option.get_rect()
                 option_rect.topleft = (x + i * option_group_padding, y + j * options_surfaces_padding)
                 if i == self.current_group and j == self.current_option_index:
-                    pygame.draw.rect(surface, (0, 100, 0), option_rect )
+                    pygame.draw.rect(surface, (0, 100, 0), option_rect)
                 surface.blit(option, option_rect)
 
 
@@ -964,7 +964,6 @@ menu_game.append_option('HARD', lambda: print('hard'), 0)
 menu_game.append_option('FAST', lambda: print('FAST'), 1)
 menu_game.append_option('BALANCED', lambda: print('BALANCED'), 1)
 menu_game.append_option('STRONG', lambda: print('STRONG'), 1)
-
 
 # Objects in different scenes
 ui = UI()
@@ -990,7 +989,6 @@ bullets = [[], [], []]
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
-
 current_scene = None
 
 
@@ -1012,7 +1010,6 @@ def menu(objects):
                 play = False
                 switch_scene(None)
 
-
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 switch_scene(scene1)
                 play = False
@@ -1031,25 +1028,11 @@ def menu(objects):
                 elif event.key == pygame.K_SPACE:
                     menu_game.select()
 
-
         window.fill((0, 0, 0))
         menu_game.draw(window, 100, 100, 300, 300)
 
-
         global keys
         keys = pygame.key.get_pressed()
-
-
-        for bullet in bullets[scene_play]:
-            bullet.update()
-            bullet.draw()
-
-        for obj in objects[scene_play]:
-            obj.update()
-            obj.draw()
-        ui.update()
-        ui.draw()
-
         pygame.display.update()
         clock.tick(FPS)
 
