@@ -16,6 +16,8 @@ pygame.display.set_caption('Village Hero')
 pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
 fontUI = pygame.font.Font(None, 30)
 font_dialog = pygame.font.SysFont('microsofttaile', 15)
+font_UI = pygame.font.Font(None, 30)
+font_MOB_life = pygame.font.Font(None, 19)
 
 """Surface"""
 # surf = pygame.Surface((2000, 2000))
@@ -158,6 +160,32 @@ MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 2]
 MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
 MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 2, 3, 4]
 SCROLLS_LIMIT = [10, 11, 12, 13, 14, 15, 16, 17]
+
+
+class UI:
+    def __init__(self):
+        pass
+
+    def update(self):
+        pass
+
+    def draw(self):
+        for obj in objects:
+            # Hero life and scrolls
+            if obj.type == 'hero':
+                window.blit(imgBonuses[1], (5, 5, 32, 32))
+                window.blit(imgBonuses[0], (50, 5, 32, 32))
+                text_hp = fontUI.render(str(obj.hp), 0, 'red')
+                text_scrolls = fontUI.render(str(obj.scrolls), 0, 'blue')
+                rect = text_hp.get_rect(center=(37, 16))
+                rect1 = text_scrolls.get_rect(center=(92, 16))
+                window.blit(text_hp, rect)
+                window.blit(text_scrolls, rect1)
+            # Mob life
+            if obj.type == 'mob':
+                text_hp = font_MOB_life.render(str(obj.hp), 0, 'red')
+                rect = text_hp.get_rect(center=(obj.rect.center[0], obj.rect.center[1] - obj.rect.height // 2))
+                window.blit(text_hp, rect)
 
 
 class Hero:
@@ -455,6 +483,7 @@ class Princess:
         self.direct = direct
         self.moveSpeed = 1
         self.words = words
+        self.bonus_probability = randint(0, 2)
         self.image = imgPrincess[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
         self.activities = 0
@@ -464,6 +493,7 @@ class Princess:
         self.hp = 2
         self.message_time_counter = 0
         self.message_group_counter = 0
+        self.activity_speed = 5 - self.rank // 2
 
     def update(self):
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
@@ -474,7 +504,7 @@ class Princess:
 
         # Activities
         if self.activities == 0 and self.activity_timer < 100:
-            if self.activity_timer % 4 == 0:
+            if self.activity_timer % self.activity_speed == 0:
                 self.rect.x -= self.moveSpeed
             self.direct = 3
             self.image = imgPrincess[self.rank][self.direct][self.count]
@@ -483,13 +513,13 @@ class Princess:
             self.image = imgPrincess[self.rank][self.direct][0]
 
         if self.activities == 2 and self.activity_timer < 100:
-            if self.activity_timer % 4 == 0:
+            if self.activity_timer % self.activity_speed == 0:
                 self.rect.y += self.moveSpeed
             self.direct = 2
             self.image = imgPrincess[self.rank][self.direct][self.count]
 
         if self.activities == 3 and self.activity_timer < 100:
-            if self.activity_timer % 4 == 0:
+            if self.activity_timer % self.activity_speed == 0:
                 self.rect.x += self.moveSpeed
             self.direct = 1
             self.image = imgPrincess[self.rank][self.direct][self.count]
@@ -498,7 +528,7 @@ class Princess:
             self.image = imgPrincess[self.rank][self.direct][0]
 
         if self.activities == 5 and self.activity_timer < 100:
-            if self.activity_timer % 4 == 0:
+            if self.activity_timer % self.activity_speed == 0:
                 self.rect.y -= self.moveSpeed
             self.direct = 0
             self.image = imgPrincess[self.rank][self.direct][self.count]
@@ -530,8 +560,8 @@ class Princess:
                 self.message_time_counter = 0
                 if self.message_group_counter == 2:
                     sound_danger.play()
-                    Mob(self.rect.center[0]+30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
-                    Mob(self.rect.center[0]-30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
+                    Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
+                    Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
                 if self.message_group_counter == len(self.words):
                     objects.remove(self)
                     for i in range(6):
@@ -555,9 +585,8 @@ class Princess:
             self.hp -= value
             if self.hp <= 0:
                 objects.remove(self)
-                bonus_probability = randint(1, 4)
-                if bonus_probability < 2:
-                    Bonus(self, bonus_probability)
+                if self.bonus_probability < 2:
+                    Bonus(self, self.bonus_probability)
                 sound_mob_death.play()
 
 
@@ -603,7 +632,11 @@ Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good
 Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
 Mob(300, 500, 0, [['', 'Hungry', 'GRR', 'Food']], 2)
 Mob(400, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
-
+Mob(500, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 1)
+Mob(600, 500, 0, [['', 'Food', 'GRR', 'Hungry', ]], 1)
+Mob(500, 400, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
+Mob(500, 300, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
+ui = UI()
 # for _ in range(150):
 #    while True:
 #        x = randint(0, WIDTH // TILE - 1) * TILE
@@ -636,6 +669,8 @@ while play:
     for obj in objects:
         obj.update()
         obj.draw()
+    ui.update()
+    ui.draw()
 
     pygame.display.update()
     clock.tick(FPS)
