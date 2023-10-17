@@ -173,6 +173,50 @@ imgPrincess = [[[
             pygame.image.load('images/sprites/mob/level_5/left_3.png'),
         ]
     ],
+[[
+        pygame.image.load('images/sprites/mob/level_5/front_1.png'),
+        pygame.image.load('images/sprites/mob/level_5/front_2.png'),
+        pygame.image.load('images/sprites/mob/level_5/front_3.png')
+    ],
+        [
+            pygame.image.load('images/sprites/mob/level_5/right_1.png'),
+            pygame.image.load('images/sprites/mob/level_5/right_2.png'),
+            pygame.image.load('images/sprites/mob/level_5/right_3.png')
+        ],
+        [
+            pygame.image.load('images/sprites/mob/level_5/back_1.png'),
+            pygame.image.load('images/sprites/mob/level_5/back_2.png'),
+            pygame.image.load('images/sprites/mob/level_5/back_3.png'),
+
+        ],
+        [
+            pygame.image.load('images/sprites/mob/level_5/left_1.png'),
+            pygame.image.load('images/sprites/mob/level_5/left_2.png'),
+            pygame.image.load('images/sprites/mob/level_5/left_3.png'),
+        ]
+    ],
+[[
+        pygame.image.load('images/sprites/mob/boss/front_1.png'),
+        pygame.image.load('images/sprites/mob/boss/front_2.png'),
+        pygame.image.load('images/sprites/mob/boss/front_3.png')
+    ],
+        [
+            pygame.image.load('images/sprites/mob/boss/right_1.png'),
+            pygame.image.load('images/sprites/mob/boss/right_2.png'),
+            pygame.image.load('images/sprites/mob/boss/right_3.png')
+        ],
+        [
+            pygame.image.load('images/sprites/mob/boss/back_1.png'),
+            pygame.image.load('images/sprites/mob/boss/back_2.png'),
+            pygame.image.load('images/sprites/mob/boss/back_3.png'),
+
+        ],
+        [
+            pygame.image.load('images/sprites/mob/boss/left_1.png'),
+            pygame.image.load('images/sprites/mob/boss/left_2.png'),
+            pygame.image.load('images/sprites/mob/boss/left_3.png'),
+        ]
+    ],
 ]
 
 imgHero = [[[
@@ -727,7 +771,7 @@ class Princess:
         self.hp = 2
         self.message_time_counter = 0
         self.message_group_counter = 0
-        self.activity_speed = 5 - self.rank // 2
+        self.activity_speed = 4 - self.rank // 2
 
     def update(self):
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
@@ -850,8 +894,8 @@ class Mob(Princess):
         self.message_group_counter = -1
         super().update()
 
-        if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < 60 and abs(
-                abs(User.rect.center[1]) - abs(self.rect.center[1])) < 60 and self.shotTimer == 0:
+        if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < self.bulletDistance and abs(
+                abs(User.rect.center[1]) - abs(self.rect.center[1])) < self.bulletDistance and self.shotTimer == 0:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
 
@@ -859,6 +903,22 @@ class Mob(Princess):
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
                 sound_mob_shot.play()
+
+class Boss(Mob):
+    def update(self):
+        super().update()
+        if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < self.bulletDistance and abs(
+                abs(User.rect.center[1]) - abs(self.rect.center[1])) < self.bulletDistance and self.shotTimer == 0:
+            print(User.rect.center[0], self.rect.center[0])
+            print(User.rect.center[1], self.rect.center[1])
+            dx = DIRECTS[self.direct][0] * self.bulletSpeed
+            dy = DIRECTS[self.direct][1] * self.bulletSpeed
+
+            if self.activity_timer % self.shotDelay == 0:
+                Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
+                       self.bulletSize)
+                sound_mob_shot.play()
+
 
 
 # Objects in different scenes
@@ -873,12 +933,13 @@ User = Hero(10, 1, 100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+boss_1 = Boss(600, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [mob],
     [],
     [mob, User],
-    [mob2, User, mob3, mob4, mob5]
+    [mob2, User, mob3, mob4, mob5, boss_1]
 ]
 bullets = [[], [], []]
 
