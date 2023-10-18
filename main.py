@@ -876,7 +876,7 @@ class Princess:
                 objects[scene_play].remove(self)
                 if self.bonus_probability < 2:
                     Bonus(self, self.bonus_probability)
-                if User.rank < len(EXPERIENCE):
+                if User.rank < len(EXPERIENCE) - 1:
                     User.xp += self.rank
                     if User.xp >= EXPERIENCE[User.rank]:
                         User.rank += 1
