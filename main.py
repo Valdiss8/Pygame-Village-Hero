@@ -413,6 +413,7 @@ sound_pickup_magic_scroll = pygame.mixer.Sound('sounds/pick_up_scroll.mp3')
 sound_pickup_healing = pygame.mixer.Sound('sounds/pick_up_healing.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
+sound_map_next = pygame.mixer.Sound('sounds/map_next_level.mp3')
 
 MOVE_SPEED_MENU = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
@@ -659,7 +660,6 @@ class Bang:
     def __init__(self, px, py):
         objects[scene_play].append(self)
         self.type = 'bang'
-
         self.px, self.py = px, py
         self.frame = 0
 
@@ -877,8 +877,6 @@ class Princess:
                     User.xp += self.rank
                     if User.xp >= EXPERIENCE[User.rank]:
                         User.rank += 1
-                        print(len(EXPERIENCE), User.rank)
-
                 sound_mob_death.play()
 
 
@@ -936,6 +934,18 @@ class Boss(Mob):
                 Bullet(self, self.rect.centerx, self.rect.centery, 0, 1, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
                 sound_mob_shot.play()
+    def damage(self, value):
+        if self.shield == False:
+            self.hp -= value
+            if self.hp <= 0:
+                objects[scene_play].remove(self)
+                if self.bonus_probability < 2:
+                    Bonus(self, self.bonus_probability)
+                if User.rank < len(EXPERIENCE):
+                    User.xp += self.rank
+                    if User.xp >= EXPERIENCE[User.rank]:
+                        User.rank += 1
+                sound_map_level_1_happy.play()
 
 
 # Menu
@@ -1335,7 +1345,7 @@ def scene1(objects):
             User.rect.x = 30
             User.rect.y = 350
             switch_scene(scene_boss)
-
+            sound_danger.play()
             play = False
 
         window.blit(imgExit, (1160, 350))
@@ -1379,6 +1389,8 @@ def scene2(objects):
             SCENE_SAVED = scene_play + 1
             User.rect.x = 70
             User.rect.y = 680
+            sound_danger.play()
+
             switch_scene(scene_boss)
             play = False
         window.blit(imgExit, (1160, 350))
