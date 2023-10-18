@@ -428,6 +428,9 @@ sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
 MOVE_SPEED_MENU = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
 HP_MENU = [5, 6, 7, 8, 9, 10, 11, 12]
+CONSTANT_MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
+CONSTANT_BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
+CONSTANT_HP = [5, 6, 7, 8, 9, 10, 11, 12]
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 EXPERIENCE = [7, 14, 30, 50, 80, 150, 250, 400]
@@ -1141,42 +1144,42 @@ SCENE_NAME = 'scene1'
 
 # MENU funtions
 def menu_choose_easy_mode():
-    global HP_MENU, HP
-    HP_MENU = HP
+    global HP_MENU, CONSTANT_HP
+    HP_MENU = CONSTANT_HP
     HP_MENU = [i + 3 for i in HP_MENU]
 
 
 
 def menu_choose_medium_mode():
-    global HP_MENU, HP
-    HP_MENU = HP
+    global HP_MENU, CONSTANT_HP
+    HP_MENU = CONSTANT_HP
 
 
 
 def menu_choose_hard_mode():
-    global HP_MENU, HP
-    HP_MENU = HP
+    global HP_MENU, CONSTANT_HP
+    HP_MENU = CONSTANT_HP
     HP_MENU = [i - 2 for i in HP_MENU]
 
 
 def menu_choose_fast():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
-    BULLET_DAMAGE_MENU = BULLET_DAMAGE
-    MOVE_SPEED_MENU = MOVE_SPEED
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE , CONSTANT_MOVE_SPEED
+    BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
+    MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = [i - 1 if i > 1 else i for i in BULLET_DAMAGE_MENU]
     MOVE_SPEED_MENU = [i + 1 for i in MOVE_SPEED_MENU]
 
 
 def menu_choose_balanced():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
-    BULLET_DAMAGE_MENU = BULLET_DAMAGE
-    MOVE_SPEED_MENU = MOVE_SPEED
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
+    BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
+    MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
 
 
 def menu_choose_strong():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
-    BULLET_DAMAGE_MENU = BULLET_DAMAGE
-    MOVE_SPEED_MENU = MOVE_SPEED
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
+    BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
+    MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
     MOVE_SPEED_MENU = [i - 1 if i > 1 else i for i in MOVE_SPEED_MENU]
     BULLET_DAMAGE_MENU = [i + 1 for i in BULLET_DAMAGE_MENU]
 
@@ -1190,12 +1193,15 @@ def start():
     BULLET_DAMAGE = BULLET_DAMAGE_MENU
     MOVE_SPEED = MOVE_SPEED_MENU
     HP = HP_MENU
+    # If deleted not change hp as selected. Otherwise doesn't load hp
+    User.hp = HP[User.rank]
     return True
 
 
 def save():
-    global objects, User, Princess, Boss, SCENE_SAVED, SCENE_NAME
+    global objects, User, Princess, Boss, SCENE_SAVED, SCENE_NAME, HP, MOVE_SPEED, BULLET_DAMAGE
     # Create a dictionary to store game data
+
     game_data = {"scene_play": SCENE_SAVED,
                  "scene_name": SCENE_NAME,
                  "User": {
@@ -1204,6 +1210,9 @@ def save():
                      "hp": User.hp,
                      "scrolls": User.scrolls,
                      "xp": User.xp,
+                     "HP": HP,
+                     "MOVE_SPEED": MOVE_SPEED ,
+                     "BULLET_DAMAGE": BULLET_DAMAGE
                  },
                  "princess": {
                      "rect_x_y": (princess.rect.x, princess.rect.y),
@@ -1225,7 +1234,7 @@ def save():
 
 
 def load():
-    global objects, User, princess, boss, SCENE_SAVED, SCENE_NAME
+    global objects, User, princess, boss, SCENE_SAVED, SCENE_NAME, BULLET_DAMAGE, MOVE_SPEED, HP
     with open('savings.json', 'r') as file:
         game_data = json.load(file)
 
@@ -1236,6 +1245,10 @@ def load():
     User.hp = game_data["User"]["hp"]
     User.scrolls = game_data["User"]["scrolls"]
     User.xp = game_data["User"]["xp"]
+    HP = game_data["User"]["HP"]
+    MOVE_SPEED = game_data["User"]["MOVE_SPEED"]
+    BULLET_DAMAGE = game_data["User"]["BULLET_DAMAGE"]
+    print('load', User.hp)
     for mob in game_data["mobs"]:
 
         if mob["rank"] == 0:
@@ -1246,7 +1259,7 @@ def load():
             Mob(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
 
     SCENE_NAME = scene_name
-    start()
+    return True
 
 
 menu_game = Menu()
