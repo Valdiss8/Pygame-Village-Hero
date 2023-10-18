@@ -1059,10 +1059,10 @@ def start():
 #                    file.write(str(mob.hp))
 #
 def save():
-    global objects, User, Princess, Boss
+    global objects, User, Princess, Boss, scene_play
 
     # Create a dictionary to store game data
-    game_data = {
+    game_data = {"scene_play": scene_play,
         "User": {
             "rank": User.rank,
             "rect_x_y": (User.rect.x, User.rect.y),
