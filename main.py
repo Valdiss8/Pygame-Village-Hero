@@ -2,8 +2,11 @@ import json
 import pickle
 import sys
 
+import mixer as mixer
 import pygame
 from random import randint
+
+from pygame.mixer import music
 
 pygame.init()
 '''Interface'''
@@ -19,7 +22,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('Village Hero')
 pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
 fontUI = pygame.font.Font(None, 30)
-font_dialog = pygame.font.Font(None, 16)
+font_dialog = pygame.font.Font(None, 20)
 font_UI = pygame.font.Font(None, 30)
 font_MOB_life = pygame.font.Font(None, 19)
 font_MENU = pygame.font.Font(None, 60)
@@ -399,6 +402,8 @@ imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
               pygame.image.load('images/bonus/healing.png')]
 
 """Sounds"""
+
+
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
 sound_heavy_attack = pygame.mixer.Sound('sounds/heavy_attack.mp3')
@@ -411,9 +416,14 @@ sound_mob_shot = pygame.mixer.Sound('sounds/mob_shot_1.mp3')
 sound_danger = pygame.mixer.Sound('sounds/danger.mp3')
 sound_pickup_magic_scroll = pygame.mixer.Sound('sounds/pick_up_scroll.mp3')
 sound_pickup_healing = pygame.mixer.Sound('sounds/pick_up_healing.mp3')
+sound_level_up = pygame.mixer.Sound('sounds/level_up2.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 sound_map_next = pygame.mixer.Sound('sounds/map_next_level.mp3')
+sound_menu = pygame.mixer.Sound('sounds/menu_sound.mp3')
+sound_menu_click = pygame.mixer.Sound('sounds/menu_switch.mp3')
+sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
+
 
 MOVE_SPEED_MENU = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
@@ -882,6 +892,7 @@ class Princess:
                     if User.xp >= EXPERIENCE[User.rank]:
                         print(EXPERIENCE[User.rank])
                         User.rank += 1
+                        sound_level_up.play()
                 sound_mob_death.play()
 
 
@@ -950,6 +961,7 @@ class Boss(Mob):
                     User.xp += self.rank
                     if User.xp >= EXPERIENCE[User.rank]:
                         User.rank += 1
+
                 sound_map_level_1_happy.play()
 
 
@@ -966,11 +978,13 @@ class Menu:
         self.callbacks[group].append(callback)
 
     def switch(self, vertical_direction, horisontal_direction):
+        sound_menu_click.play()
         self.current_group = max(0, min(self.current_group + vertical_direction, len(self.option_surfaces) - 1))
         self.current_option_index = max(0, min(self.current_option_index + horisontal_direction,
                                                len(self.option_surfaces[self.current_group]) - 1))
 
     def select(self):
+        sound_menu_select.play()
         return self.callbacks[self.current_group][self.current_option_index]()
 
     def draw(self, surface, x, y, option_group_padding, options_surfaces_padding):
@@ -1272,6 +1286,7 @@ def menu(objects):
                 switch_scene(None)
             elif event.type == pygame.KEYDOWN:
 
+
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     global SCENE_SAVED
                     if SCENE_SAVED == 1:
@@ -1297,7 +1312,7 @@ def menu(objects):
                         function_to_call = globals()[SCENE_NAME]
                         function_to_call(objects)
                         play = False
-
+        #sound_menu.play()
         window.blit(back_map[scene_play], (0, 0))
         menu_game.draw(window, 150, 150, 300, 200)
         pygame.display.update()
