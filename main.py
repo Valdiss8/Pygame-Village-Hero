@@ -1266,9 +1266,7 @@ def menu(objects):
                 switch_scene(menu)
                 play = False
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(scene1)
-                play = False
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g:
                     switch_scene(scene1)
@@ -1318,9 +1316,7 @@ def scene1(objects):
                 play = False
                 switch_scene(None)
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(scene2)
-                play = False
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 global SCENE_SAVED
                 SCENE_SAVED = scene_play
@@ -1364,9 +1360,7 @@ def scene2(objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(scene_boss)
-                play = False
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 global SCENE_SAVED
                 SCENE_SAVED = scene_play
@@ -1410,9 +1404,7 @@ def scene_boss(objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                switch_scene(menu)
-                play = False
+
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 global SCENE_SAVED
                 SCENE_SAVED = scene_play
