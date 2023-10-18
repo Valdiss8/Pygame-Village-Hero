@@ -688,7 +688,6 @@ class Bonus:
             self.timer -= 1
         else:
             objects[scene_play].remove(self)
-
         for obj in objects[scene_play]:
             if obj.type == 'hero' and self.rect.colliderect(obj.rect):
                 if self.bonusNum == 0:
