@@ -970,15 +970,15 @@ mob3 = Mob(300, 400, 0, [['', 'Hungry', 'GRR', 'Food']], 3)
 mob4 = Mob(300, 300, 0, [['', 'Hungry', 'GRR', 'Food']], 4)
 mob5 = Mob(300, 100, 0, [['', 'Hungry', 'GRR', 'Food']], 5)
 
-User = Hero(100, 275, 0,
+User = Hero(100, 680, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
-princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
+princess = Princess(50, 680, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
 boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [],
-    [User, mob5, mob3],
+    [User, princess],
     [mob, User, princess],
     [mob2, User, mob3, mob4, mob5, boss]
 ]
