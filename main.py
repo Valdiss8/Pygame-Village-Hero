@@ -640,7 +640,7 @@ class Bullet:
             bullets[scene_play].remove(self)
         else:
             for obj in objects[scene_play]:
-                if obj != self.parent and obj.type != self.parent.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
+                if obj != self.parent and obj.type != self.parent.type and obj.type != 'princess' and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
                         self.px,
                         self.py):
                     obj.damage(self.damage)
@@ -964,25 +964,51 @@ class Menu:
 
 # Objects in different scenes
 ui = UI()
-mob = Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
-mob2 = Mob(300, 500, 0, [['', 'Hungry', 'GRR', 'Food']], 2)
-mob3 = Mob(300, 400, 0, [['', 'Hungry', 'GRR', 'Food']], 3)
-mob4 = Mob(300, 300, 0, [['', 'Hungry', 'GRR', 'Food']], 4)
-mob5 = Mob(300, 100, 0, [['', 'Hungry', 'GRR', 'Food']], 5)
-
 User = Hero(100, 680, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 princess = Princess(50, 680, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
+
+princess_words = [['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'], ['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'] ] * 300
+princess_end = Princess(1150, 350, 0, princess_words, 0)
+print(princess_words)
+boss = Boss(1100, 340, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [],
     [User, princess],
-    [mob, User, princess],
-    [mob2, User, mob3, mob4, mob5, boss]
+    [User, ],
+    [User, boss, princess_end]
 ]
 bullets = [[], [], [], []]
+
+# Scene 1 objects
+
+for _ in range(25):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[1]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[1].append(Mob(x, y, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1))
+
+for _ in range(18):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
+        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        fined = False
+        for obj in objects[1]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[1].append(Mob(x, y, 0, [['', 'Uuuu', 'Shshsh', 'Aaaaa']], 2))
 
 for _ in range(150):
     while True:
@@ -995,7 +1021,92 @@ for _ in range(150):
                 fined = True
         if not fined:
             break
-    objects[1].append(Block(x, y, TILE))
+    block = Block(x, y, TILE)
+    objects[1].append(block)
+
+# Scene 2 objects
+
+for _ in range(25):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[2]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[2].append(Mob(x, y, 0, [['', 'AAAA', 'SHshSH', 'Buga-ga']], 3))
+
+for _ in range(18):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
+        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        fined = False
+        for obj in objects[2]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[2].append(Mob(x, y, 0, [['', 'Catch him', 'AAAAA', 'Advance']], 4))
+
+for _ in range(150):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[2]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    block = Block(x, y, TILE)
+    objects[2].append(block)
+
+# Scene Boss
+for _ in range(10):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[3]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[3].append(Mob(x, y, 0, [['', 'We will', 'destroy', 'you']], 5))
+
+for _ in range(10):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
+        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        fined = False
+        for obj in objects[3]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    objects[3].append(Mob(x, y, 0, [['', 'Attack', 'Catch him', 'Food']], 4))
+
+for _ in range(50):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[3]:
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
+    block = Block(x, y, TILE)
+    objects[3].append(block)
+
 
 
 SCENE_SAVED = 1
