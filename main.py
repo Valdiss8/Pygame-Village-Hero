@@ -10,7 +10,7 @@ pygame.init()
 
 WIDTH, HEIGHT = 1200, 780
 FPS = 60
-TILE = 32
+TILE = 40
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
@@ -391,7 +391,7 @@ imgHero = [[[
     ],
 
 ]
-imgBrick = pygame.image.load('images/block_brick.png')
+imgBrick = pygame.image.load('images/map/tile.jpg')
 
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
               pygame.image.load('images/bonus/healing.png')]
@@ -712,7 +712,7 @@ class Block:
         #objects.append(self)
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
-        self.hp = 1
+        self.hp = 35
 
     def update(self):
         pass
@@ -721,7 +721,9 @@ class Block:
         window.blit(imgBrick, self.rect)
 
     def damage(self, value):
-        pass
+        self.hp -= value
+        if self.hp <= 0:
+            objects[scene_play].remove(self)
 
 
 class Message:
@@ -989,8 +991,10 @@ for _ in range(150):
         rect = pygame.Rect(x, y, TILE, TILE)
         fined = False
         for obj in objects[1]:
-            if rect.colliderect(obj.rect): fined = True
-        if not fined: break
+            if rect.colliderect(obj.rect):
+                fined = True
+        if not fined:
+            break
     objects[1].append(Block(x, y, TILE))
 
 
