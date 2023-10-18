@@ -428,6 +428,7 @@ BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 60, 60, 70, 70, 70, 80, 80]
+
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
 MOB_HP = [2, 4, 7, 10, 15, 25, 35, 50]
 MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 150]
@@ -1126,9 +1127,11 @@ def menu_choose_easy_mode():
     HP_MENU = [i + 3 for i in HP_MENU]
 
 
+
 def menu_choose_medium_mode():
     global HP_MENU, HP
     HP_MENU = HP
+
 
 
 def menu_choose_hard_mode():
@@ -1262,15 +1265,8 @@ def menu(objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                switch_scene(menu)
-                play = False
-
-
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_g:
-                    switch_scene(scene1)
-                    play = False
+
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     global SCENE_SAVED
                     if SCENE_SAVED == 1:
@@ -1292,11 +1288,9 @@ def menu(objects):
                     if select_count == 0:
                         menu_game.select()
                         select_count += 1
-
                     if menu_game.select() == True:
                         function_to_call = globals()[SCENE_NAME]
                         function_to_call(objects)
-
                         play = False
 
         window.blit(back_map[scene_play], (0, 0))
@@ -1310,6 +1304,7 @@ def scene1(objects):
     scene_play = 1
     SCENE_NAME = 'scene1'
     play = True
+    print(HP, HP_MENU, User.hp)
     while play:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
