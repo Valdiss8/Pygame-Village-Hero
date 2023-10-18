@@ -391,6 +391,7 @@ imgHero = [[[
     ],
 
 ]
+imgExit = pygame.image.load('images/map/exit.png')
 imgBrick = pygame.image.load('images/map/tile.jpg')
 
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
@@ -971,19 +972,11 @@ princess = Princess(50, 680, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good 
 
 princess_words = [['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'], ['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'] ] * 300
 princess_end = Princess(1150, 350, 0, princess_words, 0)
-print(princess_words)
 boss = Boss(1100, 340, 0, [['', 'She', 'is', 'mine']], 7)
-
-objects = [
-    [],
-    [User, princess],
-    [User, ],
-    [User, boss, princess_end]
-]
+objects = [[], [User, princess], [User, ], [User, boss, princess_end]]
 bullets = [[], [], [], []]
 
 # Scene 1 objects
-
 for _ in range(25):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1357,6 +1350,14 @@ def scene2(objects):
         for obj in objects[scene_play]:
             obj.update()
             obj.draw()
+        if User.rect.x >= 50 and abs(User.rect.y - 650) <= 20: #1150, 350
+            SCENE_SAVED = scene_play + 1
+            User.rect.x = 70
+            User.rect.y = 680
+            switch_scene(scene_boss)
+            print(User.rect.x, User.rect.y)
+            play = False
+
         ui.update()
         ui.draw()
 
