@@ -1093,8 +1093,8 @@ def save():
     with open('savings.json', 'w') as file:
         json.dump(game_data, file)
 
-# To save the game data
-save()
+
+
 
 menu_game = Menu()
 menu_game.append_option('EASY', menu_choose_easy_mode, 0)
@@ -1109,12 +1109,9 @@ menu_game.append_option('START', start, 2)
 menu_game.append_option('EXIT', exit, 3)
 
 
-
-
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
 current_scene = None
-
 
 # Main proces with scenes
 def switch_scene(scene):
@@ -1125,12 +1122,10 @@ def switch_scene(scene):
 def menu(objects):
     global scene_play
     scene_play = 0
-
     play = True
     while play:
         select_count = 0
         global BULLET_DAMAGE_MENU, HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, HP, MOVE_SPEED
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play = False
@@ -1155,15 +1150,12 @@ def menu(objects):
                     if select_count == 0:
                         menu_game.select()
                         select_count += 1
-
                     if menu_game.select() == True:
                         switch_scene(scene1)
-
                         play = False
 
         window.fill((0, 0, 0))
         menu_game.draw(window, 100, 100, 300, 300)
-
         pygame.display.update()
         clock.tick(FPS)
 
