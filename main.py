@@ -31,7 +31,8 @@ font_MENU = pygame.font.Font(None, 60)
 pygame.display.update()
 
 """Images"""
-back_map = [pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
+
+back_map = [pygame.image.load('images/map/menu/back_1.png').convert(),
             pygame.image.load('images/map/map_level_1/back_1.jpg').convert(),
             pygame.image.load('images/map/map_level_2/back_1.jpg').convert(),
             pygame.image.load('images/map/map_level_boss/back_1.jpg').convert(),
@@ -393,6 +394,7 @@ imgHero = [[[
 ]
 imgExit = pygame.image.load('images/map/exit.png')
 imgBrick = pygame.image.load('images/map/tile.jpg')
+
 
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
               pygame.image.load('images/bonus/healing.png')]
@@ -1287,8 +1289,8 @@ def menu(objects):
                         switch_scene(scene1)
                         play = False
 
-        window.fill((0, 0, 0))
-        menu_game.draw(window, 100, 100, 300, 300)
+        window.blit(back_map[scene_play], (0, 0))
+        menu_game.draw(window, 150, 150, 300, 200)
         pygame.display.update()
         clock.tick(FPS)
 
