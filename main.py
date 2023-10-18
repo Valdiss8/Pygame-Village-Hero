@@ -620,6 +620,7 @@ class Hero:
             self.hp -= value
             if self.hp <= 0:
                 objects[scene_play].remove(self)
+                switch_scene(menu)
 
                 sound_finish.play()
 
