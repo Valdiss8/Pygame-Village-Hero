@@ -708,8 +708,8 @@ class Bonus:
 
 
 class Block:
-    def __init__(self, px, py, size):
-        objects[scene_play].append(self)
+    def __init__(self, px, py, size ):
+        #objects.append(self)
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 1
@@ -721,9 +721,7 @@ class Block:
         window.blit(imgBrick, self.rect)
 
     def damage(self, value):
-        self.hp -= value
-        if self.hp <= 0:
-            objects[scene_play].remove(self)
+        pass
 
 
 class Message:
@@ -977,12 +975,25 @@ princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good
 boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
-    [mob],
     [],
+    [User, mob5, mob3],
     [mob, User, princess],
     [mob2, User, mob3, mob4, mob5, boss]
 ]
 bullets = [[], [], [], []]
+
+for _ in range(150):
+    while True:
+        x = randint(0, WIDTH // TILE - 1) * TILE
+        y = randint(1, HEIGHT // TILE - 1) * TILE
+        rect = pygame.Rect(x, y, TILE, TILE)
+        fined = False
+        for obj in objects[1]:
+            if rect.colliderect(obj.rect): fined = True
+        if not fined: break
+    objects[1].append(Block(x, y, TILE))
+
+
 SCENE_SAVED = 1
 
 # MENU funtions
@@ -1141,7 +1152,6 @@ def menu(objects):
                         switch_scene(scene2)
                     if SCENE_SAVED == 3:
                         switch_scene(scene_boss)
-
                     play = False
                 if event.key == pygame.K_UP:
                     menu_game.switch(0, -1)
@@ -1163,7 +1173,6 @@ def menu(objects):
         menu_game.draw(window, 100, 100, 300, 300)
         pygame.display.update()
         clock.tick(FPS)
-
 
 def scene1(objects):
     global scene_play
