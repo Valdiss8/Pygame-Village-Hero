@@ -620,6 +620,8 @@ class Hero:
             self.hp -= value
             if self.hp <= 0:
                 objects[scene_play].remove(self)
+                print(type(switch_scene(menu)) )
+
                 switch_scene(menu)
 
                 sound_finish.play()
@@ -1335,7 +1337,7 @@ def scene1(objects):
             SCENE_SAVED = scene_play + 1
             User.rect.x = 30
             User.rect.y = 350
-            switch_scene(scene_boss)
+            switch_scene(scene2)
             sound_danger.play()
             play = False
 
