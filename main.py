@@ -1103,6 +1103,7 @@ for _ in range(50):
 
 
 SCENE_SAVED = 1
+SCENE_NAME = None
 
 # MENU funtions
 def menu_choose_easy_mode():
@@ -1156,9 +1157,10 @@ def start():
 
 
 def save():
-    global objects, User, Princess, Boss, SCENE_SAVED
+    global objects, User, Princess, Boss, SCENE_SAVED, SCENE_NAME
     # Create a dictionary to store game data
     game_data = {"scene_play": SCENE_SAVED,
+                 "scene_name": SCENE_NAME,
         "User": {
             "rank": User.rank,
             "rect_x_y": (User.rect.x, User.rect.y),
@@ -1186,24 +1188,27 @@ def save():
 
 
 def load():
-    global objects, User, princess, boss, SCENE_SAVED
+    global objects, User, princess, boss, SCENE_SAVED, SCENE_NAME
     with open('savings.json', 'r') as file:
         game_data = json.load(file)
 
     # Access and use the loaded game data as needed
+    scene_name = game_data["scene_name"]
     User.rank = game_data["User"]["rank"]
     User.rect.x, User.rect.y = game_data["User"]["rect_x_y"]
     User.hp = game_data["User"]["hp"]
     User.scrolls = game_data["User"]["scrolls"]
     User.xp = game_data["User"]["xp"]
     for mob in game_data["mobs"]:
-        print(mob["rank"])
+
         if mob["rank"] == 0:
             Princess(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
         if mob["rank"] == 7:
             Boss(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
         else:
             Mob(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+
+    SCENE_NAME = scene_name
     start()
 
 menu_game = Menu()
@@ -1236,7 +1241,8 @@ def menu(objects):
     play = True
     while play:
         select_count = 0
-        global BULLET_DAMAGE_MENU, HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, HP, MOVE_SPEED
+        global BULLET_DAMAGE_MENU, HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, HP, MOVE_SPEED, SCENE_NAME
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play = False
@@ -1273,7 +1279,11 @@ def menu(objects):
                     if select_count == 0:
                         menu_game.select()
                         select_count += 1
+
                     if menu_game.select() == True:
+                        if SCENE_NAME:
+                            function_to_call = globals()[SCENE_NAME]
+                            function_to_call(objects)
                         switch_scene(scene1)
                         play = False
 
@@ -1283,13 +1293,11 @@ def menu(objects):
         clock.tick(FPS)
 
 def scene1(objects):
-    global scene_play
+    global scene_play, SCENE_NAME
     scene_play = 1
-
+    SCENE_NAME = 'scene1'
     play = True
     while play:
-
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play = False
@@ -1321,7 +1329,7 @@ def scene1(objects):
             User.rect.x = 30
             User.rect.y = 350
             switch_scene(scene_boss)
-            print(User.rect.x, User.rect.y)
+
             play = False
 
         window.blit(imgExit, (1160, 350))
@@ -1332,8 +1340,9 @@ def scene1(objects):
 
 
 def scene2(objects):
-    global scene_play
+    global scene_play, SCENE_NAME
     scene_play = 2
+    SCENE_NAME = 'scene2'
     play = True
     while play:
 
@@ -1375,8 +1384,9 @@ def scene2(objects):
         clock.tick(FPS)
 
 def scene_boss(objects):
-    global scene_play
+    global scene_play, SCENE_NAME
     scene_play = 3
+    SCENE_NAME = 'scene_boss'
     play = True
     while play:
 
