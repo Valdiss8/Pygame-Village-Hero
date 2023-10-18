@@ -632,12 +632,11 @@ class Hero:
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
-                objects[scene_play].remove(self)
-                print(type(switch_scene(menu)) )
-
-                switch_scene(menu)
-
                 sound_finish.play()
+                switch_scene(menu(objects))
+                objects[scene_play].remove(self)
+
+
 
 
 class Bullet:
@@ -1283,7 +1282,6 @@ current_scene = None
 def switch_scene(scene):
     global current_scene
     current_scene = scene
-
 
 def menu(objects):
     global scene_play
