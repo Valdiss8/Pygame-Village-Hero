@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 from random import randint
 
@@ -408,22 +410,26 @@ sound_pickup_healing = pygame.mixer.Sound('sounds/pick_up_healing.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_1_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 
+MOVE_SPEED_MENU = [1, 2, 2, 3, 3, 4, 4, 5]
+BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
+HP_MENU = [5, 6, 7, 8, 9, 10, 11, 12]
+
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 EXPERIENCE = [7, 10, 13, 15, 19, 25, 32, 40]
 MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_SPEED = [4, 5, 6, 7, 8, 9, 10, 11]
-BULLET_DAMAGE = [1, 1, 2, 3, 2, 2, 3, 4]
+BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
 BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 60, 60, 70, 70, 70, 80, 80]
 HP = [5, 6, 7, 8, 9, 10, 11, 12]
-MOB_HP = [1, 4, 7, 10, 15, 25, 35, 50]
+MOB_HP = [2, 4, 7, 10, 15, 25, 35, 50]
 MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 150]
 MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 3]
 MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
 MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 3, 3, 4]
-SCROLLS_LIMIT = [10, 11, 12, 13, 14, 15, 16, 17]
+SCROLLS_LIMIT = [10, 10, 11, 11, 12, 13, 13, 14]
 
 
 class UI:
@@ -930,8 +936,8 @@ class Boss(Mob):
 # Menu
 class Menu:
     def __init__(self):  # option_surfaces, callbacks,
-        self.option_surfaces = [[], []]
-        self.callbacks = [[], []]
+        self.option_surfaces = [[], [], [], []]
+        self.callbacks = [[], [], [], []]
         self.current_group = 0
         self.current_option_index = 0
 
@@ -956,14 +962,59 @@ class Menu:
                     pygame.draw.rect(surface, (0, 100, 0), option_rect)
                 surface.blit(option, option_rect)
 
+# MENU funtions
+def menu_choose_easy_mode():
+    global HP_MENU
+    HP_MENU = [i + 3 for i in HP_MENU]
+
+def menu_choose_medium_mode():
+    pass
+
+def menu_choose_hard_mode():
+    global HP_MENU
+    HP_MENU = [i - 2 for i in HP_MENU]
+
+def menu_choose_fast():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU
+    BULLET_DAMAGE_MENU = [i - 1 if i > 1 else i for i in BULLET_DAMAGE_MENU]
+    MOVE_SPEED_MENU = [i + 1 for i in MOVE_SPEED_MENU]
+
+def menu_choose_balanced():
+    pass
+
+def menu_choose_strong():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU
+    MOVE_SPEED_MENU = [i - 1 if i > 1 else i for i in MOVE_SPEED_MENU]
+    BULLET_DAMAGE_MENU = [i + 1 for i in BULLET_DAMAGE_MENU]
+
+def exit():
+    sys.exit()
+
+def start():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
+    BULLET_DAMAGE = BULLET_DAMAGE_MENU
+    MOVE_SPEED = MOVE_SPEED_MENU
+    HP = HP_MENU
+    switch_scene(scene1)
+    menu.play = False
+
+
+
 
 menu_game = Menu()
-menu_game.append_option('EASY', lambda: print('Easy'), 0)
-menu_game.append_option('MEDIUM', lambda: print('MEDIUM'), 0)
-menu_game.append_option('HARD', lambda: print('hard'), 0)
-menu_game.append_option('FAST', lambda: print('FAST'), 1)
-menu_game.append_option('BALANCED', lambda: print('BALANCED'), 1)
-menu_game.append_option('STRONG', lambda: print('STRONG'), 1)
+menu_game.append_option('EASY',  menu_choose_easy_mode, 0)
+menu_game.append_option('MEDIUM',  menu_choose_medium_mode, 0)
+menu_game.append_option('HARD',  menu_choose_hard_mode, 0)
+menu_game.append_option('FAST', menu_choose_fast, 1)
+menu_game.append_option('BALANCED', menu_choose_balanced, 1)
+menu_game.append_option('STRONG', menu_choose_strong, 1)
+menu_game.append_option('LOAD', menu_choose_strong, 2)
+menu_game.append_option('SAVE', menu_choose_strong, 2)
+menu_game.append_option('START', start, 2)
+menu_game.append_option('EXIT', exit, 3)
+
+
+
 
 # Objects in different scenes
 ui = UI()
@@ -1004,6 +1055,8 @@ def menu(objects):
 
     play = True
     while play:
+        select_count = 0
+        global BULLET_DAMAGE_MENU, HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, HP, MOVE_SPEED
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1026,7 +1079,17 @@ def menu(objects):
                 if event.key == pygame.K_RIGHT:
                     menu_game.switch(+1, 0)
                 elif event.key == pygame.K_SPACE:
-                    menu_game.select()
+                    if select_count == 0:
+                        menu_game.select()
+                        select_count += 1
+                    if select_count == 1:
+                        print(select_count)
+                        HP_MENU = HP
+                        MOVE_SPEED_MENU = MOVE_SPEED
+                        BULLET_DAMAGE_MENU = BULLET_DAMAGE
+                        menu_game.select()
+
+                        print(HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE_MENU)
         window.fill((0, 0, 0))
         menu_game.draw(window, 100, 100, 300, 300)
 
@@ -1132,7 +1195,7 @@ def scene_boss(objects):
 
 
 # Switch scenes
-switch_scene(scene1)
+switch_scene(menu)
 
 # Play scene
 while current_scene is not None:
