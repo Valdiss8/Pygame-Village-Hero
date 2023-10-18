@@ -842,8 +842,8 @@ class Princess:
                 self.message_time_counter = 0
                 if self.message_group_counter == 2:
                     sound_danger.play()
-                    Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
-                    Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'Food', 'GRR', 'Hungry', ]], 2)
+                    objects[1].append(Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'SHE', 'BELONGS', 'TO US', ]], 2))
+                    objects[1].append(Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'OUR BOSS', 'GRR', 'THE BEST', ]], 2))
                 if self.message_group_counter == len(self.words):
                     objects[scene_play].remove(self)
                     for i in range(6):
@@ -1289,6 +1289,7 @@ def scene1(objects):
     play = True
     while play:
 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play = False
@@ -1315,6 +1316,16 @@ def scene1(objects):
             obj.draw()
         ui.update()
         ui.draw()
+        if User.rect.x >= 1160 and abs(User.rect.y - 350) <= 20:
+            SCENE_SAVED = scene_play + 1
+            User.rect.x = 30
+            User.rect.y = 350
+            switch_scene(scene_boss)
+            print(User.rect.x, User.rect.y)
+            play = False
+
+        window.blit(imgExit, (1160, 350))
+
 
         pygame.display.update()
         clock.tick(FPS)
@@ -1350,20 +1361,18 @@ def scene2(objects):
         for obj in objects[scene_play]:
             obj.update()
             obj.draw()
-        if User.rect.x >= 50 and abs(User.rect.y - 650) <= 20: #1150, 350
+        if User.rect.x >= 1160 and abs(User.rect.y - 350) <= 20:
             SCENE_SAVED = scene_play + 1
             User.rect.x = 70
             User.rect.y = 680
             switch_scene(scene_boss)
             print(User.rect.x, User.rect.y)
             play = False
-
+        window.blit(imgExit, (1160, 350))
         ui.update()
         ui.draw()
-
         pygame.display.update()
         clock.tick(FPS)
-
 
 def scene_boss(objects):
     global scene_play
