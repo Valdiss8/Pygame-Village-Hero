@@ -972,15 +972,15 @@ mob5 = Mob(300, 100, 0, [['', 'Hungry', 'GRR', 'Food']], 5)
 
 User = Hero(100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
-Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
+princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-Boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
+boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [mob],
     [],
-    [mob, User],
-    [mob2, User, mob3, mob4, mob5, Boss]
+    [mob, User, princess],
+    [mob2, User, mob3, mob4, mob5, boss]
 ]
 bullets = [[], [], [], []]
 
@@ -1070,31 +1070,46 @@ def save():
             "scrolls": User.scrolls,
             "xp": User.xp,
         },
-        "Princess": {
-            "rect_x_y": (Princess.rect.x, Princess.rect.y),
-            "words": Princess.words,
+        "princess": {
+            "rect_x_y": (princess.rect.x, princess.rect.y),
+            "words": princess.words,
         },
-        "Mobs": []  # List to store mob data
-
-    }
-
+        "mobs": []}
     for obj in objects:
         for item in obj:
             if isinstance(item, Mob):
                 mob_data = {
                     "rank": item.rank,
                     "rect_x_y": (item.rect.x, item.rect.y),
-                    "hp": item.hp,
+                    #"hp": item.hp,
                     "words": item.words
                 }
-                game_data["Mobs"].append(mob_data)
+                game_data["mobs"].append(mob_data)
 
     # Save the game data to a file in JSON format
     with open('savings.json', 'w') as file:
         json.dump(game_data, file)
 
+def load():
+    global objects, User, princess, boss, scene_play
+    with open('savings.json', 'r') as file:
+        game_data = json.load(file)
 
-
+    # Access and use the loaded game data as needed
+    User.rank = game_data["User"]["rank"]
+    User.rect.x, User.rect.y = game_data["User"]["rect_x_y"]
+    User.hp = game_data["User"]["hp"]
+    User.scrolls = game_data["User"]["scrolls"]
+    User.xp = game_data["User"]["xp"]
+    for mob in game_data["mobs"]:
+        print(mob["rank"])
+        if mob["rank"] == 0:
+            Princess(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+        if mob["rank"] == 7:
+            Boss(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+        else:
+            Mob(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+    start()
 
 menu_game = Menu()
 menu_game.append_option('EASY', menu_choose_easy_mode, 0)
@@ -1103,7 +1118,7 @@ menu_game.append_option('HARD', menu_choose_hard_mode, 0)
 menu_game.append_option('FAST', menu_choose_fast, 1)
 menu_game.append_option('BALANCED', menu_choose_balanced, 1)
 menu_game.append_option('STRONG', menu_choose_strong, 1)
-menu_game.append_option('LOAD', menu_choose_strong, 2)
+menu_game.append_option('LOAD', load, 2)
 menu_game.append_option('SAVE', save, 2)
 menu_game.append_option('START', start, 2)
 menu_game.append_option('EXIT', exit, 3)
@@ -1111,6 +1126,7 @@ menu_game.append_option('EXIT', exit, 3)
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
+previous_scene = menu
 current_scene = None
 
 # Main proces with scenes
@@ -1130,6 +1146,9 @@ def menu(objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                switch_scene(menu)
+                play = False
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 switch_scene(scene1)
@@ -1175,6 +1194,9 @@ def scene1(objects):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 switch_scene(scene2)
                 play = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                switch_scene(menu)
+                play = False
         global keys
         keys = pygame.key.get_pressed()
         window.blit(back_map[scene_play], (0, 0))
@@ -1206,6 +1228,9 @@ def scene2(objects):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 switch_scene(scene_boss)
                 play = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                switch_scene(menu)
+                play = False
 
         window.blit(back_map[scene_play], (0, 0))
         global keys
@@ -1236,6 +1261,9 @@ def scene_boss(objects):
                 play = False
                 switch_scene(None)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                switch_scene(menu)
+                play = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 switch_scene(menu)
                 play = False
 
