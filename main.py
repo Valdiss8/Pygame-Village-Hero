@@ -1,3 +1,5 @@
+import json
+import pickle
 import sys
 
 import pygame
@@ -470,7 +472,7 @@ class UI:
 class Hero:
     """Main character"""
 
-    def __init__(self, hp, damage, px, py, direct, keyList):
+    def __init__(self, px, py, direct, keyList):
 
         # objects[scene_play].append(self)
 
@@ -912,10 +914,8 @@ class Boss(Mob):
         super().update()
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < self.bulletDistance and abs(
                 abs(User.rect.center[1]) - abs(self.rect.center[1])) < self.bulletDistance and self.shotTimer == 0:
-
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
-            print(DIRECTS[self.direct][0], DIRECTS[self.direct][1])
 
             if self.activity_timer % self.shotDelay == 0:
                 Bullet(self, self.rect.centerx, self.rect.centery, dx, dy, self.bulletDamage, self.bulletDistance,
@@ -951,7 +951,7 @@ class Menu:
                                                len(self.option_surfaces[self.current_group]) - 1))
 
     def select(self):
-        self.callbacks[self.current_group][self.current_option_index]()
+        return self.callbacks[self.current_group][self.current_option_index]()
 
     def draw(self, surface, x, y, option_group_padding, options_surfaces_padding):
         for i, group in enumerate(self.option_surfaces):
@@ -962,60 +962,6 @@ class Menu:
                     pygame.draw.rect(surface, (0, 100, 0), option_rect)
                 surface.blit(option, option_rect)
 
-# MENU funtions
-def menu_choose_easy_mode():
-    global HP_MENU
-    HP_MENU = [i + 3 for i in HP_MENU]
-
-def menu_choose_medium_mode():
-    pass
-
-def menu_choose_hard_mode():
-    global HP_MENU
-    HP_MENU = [i - 2 for i in HP_MENU]
-
-def menu_choose_fast():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU
-    BULLET_DAMAGE_MENU = [i - 1 if i > 1 else i for i in BULLET_DAMAGE_MENU]
-    MOVE_SPEED_MENU = [i + 1 for i in MOVE_SPEED_MENU]
-
-def menu_choose_balanced():
-    pass
-
-def menu_choose_strong():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU
-    MOVE_SPEED_MENU = [i - 1 if i > 1 else i for i in MOVE_SPEED_MENU]
-    BULLET_DAMAGE_MENU = [i + 1 for i in BULLET_DAMAGE_MENU]
-
-def exit():
-    sys.exit()
-
-def start():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
-    BULLET_DAMAGE = BULLET_DAMAGE_MENU
-    MOVE_SPEED = MOVE_SPEED_MENU
-    HP = HP_MENU
-    switch_scene(scene1)
-    menu.play = False
-
-
-
-
-menu_game = Menu()
-menu_game.append_option('EASY',  menu_choose_easy_mode, 0)
-menu_game.append_option('MEDIUM',  menu_choose_medium_mode, 0)
-menu_game.append_option('HARD',  menu_choose_hard_mode, 0)
-menu_game.append_option('FAST', menu_choose_fast, 1)
-menu_game.append_option('BALANCED', menu_choose_balanced, 1)
-menu_game.append_option('STRONG', menu_choose_strong, 1)
-menu_game.append_option('LOAD', menu_choose_strong, 2)
-menu_game.append_option('SAVE', menu_choose_strong, 2)
-menu_game.append_option('START', start, 2)
-menu_game.append_option('EXIT', exit, 3)
-
-
-
-
 # Objects in different scenes
 ui = UI()
 mob = Mob(500, 500, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1)
@@ -1024,19 +970,146 @@ mob3 = Mob(300, 400, 0, [['', 'Hungry', 'GRR', 'Food']], 3)
 mob4 = Mob(300, 300, 0, [['', 'Hungry', 'GRR', 'Food']], 4)
 mob5 = Mob(300, 100, 0, [['', 'Hungry', 'GRR', 'Food']], 5)
 
-User = Hero(10, 1, 100, 275, 0,
+User = Hero(100, 275, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 Princess = Princess(200, 500, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
                                   ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
-boss_1 = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
+Boss = Boss(200, 300, 0, [['', 'She', 'is', 'mine']], 7)
 
 objects = [
     [mob],
     [],
     [mob, User],
-    [mob2, User, mob3, mob4, mob5, boss_1]
+    [mob2, User, mob3, mob4, mob5, Boss]
 ]
 bullets = [[], [], [], []]
+
+
+# MENU funtions
+def menu_choose_easy_mode():
+    global HP_MENU, HP
+    HP_MENU = HP
+    HP_MENU = [i + 3 for i in HP_MENU]
+
+
+def menu_choose_medium_mode():
+    global HP_MENU, HP
+    HP_MENU = HP
+
+
+def menu_choose_hard_mode():
+    global HP_MENU, HP
+    HP_MENU = HP
+    HP_MENU = [i - 2 for i in HP_MENU]
+
+
+def menu_choose_fast():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
+    BULLET_DAMAGE_MENU = BULLET_DAMAGE
+    MOVE_SPEED_MENU = MOVE_SPEED
+    BULLET_DAMAGE_MENU = [i - 1 if i > 1 else i for i in BULLET_DAMAGE_MENU]
+    MOVE_SPEED_MENU = [i + 1 for i in MOVE_SPEED_MENU]
+
+
+def menu_choose_balanced():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
+    BULLET_DAMAGE_MENU = BULLET_DAMAGE
+    MOVE_SPEED_MENU = MOVE_SPEED
+
+
+def menu_choose_strong():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE, MOVE_SPEED
+    BULLET_DAMAGE_MENU = BULLET_DAMAGE
+    MOVE_SPEED_MENU = MOVE_SPEED
+    MOVE_SPEED_MENU = [i - 1 if i > 1 else i for i in MOVE_SPEED_MENU]
+    BULLET_DAMAGE_MENU = [i + 1 for i in BULLET_DAMAGE_MENU]
+
+
+def exit():
+    sys.exit()
+
+
+def start():
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
+    BULLET_DAMAGE = BULLET_DAMAGE_MENU
+    MOVE_SPEED = MOVE_SPEED_MENU
+    HP = HP_MENU
+    return True
+
+
+#def save():
+#    global objects
+#    with open('savings', 'w') as file:
+#        file.write(str(User.rank))
+#        file.write(str(User.rect))
+#        file.write(str(User.hp))
+#        file.write(str(User.scrolls))
+#        file.write(str(User.xp))
+#        file.write(str(Princess.rect))
+#        file.write(str(Princess.words))
+#        file.write(str(Boss.rank))
+#        file.write(str(Boss.rect))
+#        file.write(str(Boss.hp))
+#
+#        for object in objects:
+#            for item in object:
+#                if type(item) == Mob:
+#                    file.write(str(mob.rank))
+#                    file.write(str(mob.rect))
+#                    file.write(str(mob.hp))
+#
+def save():
+    global objects, User, Princess, Boss
+
+    # Create a dictionary to store game data
+    game_data = {
+        "User": {
+            "rank": User.rank,
+            "rect_x_y": (User.rect.x, User.rect.y),
+            "hp": User.hp,
+            "scrolls": User.scrolls,
+            "xp": User.xp,
+        },
+        "Princess": {
+            "rect_x_y": (Princess.rect.x, Princess.rect.y),
+            "words": Princess.words,
+        },
+        "Mobs": []  # List to store mob data
+
+    }
+
+    for obj in objects:
+        for item in obj:
+            if isinstance(item, Mob):
+                mob_data = {
+                    "rank": item.rank,
+                    "rect_x_y": (item.rect.x, item.rect.y),
+                    "hp": item.hp,
+                    "words": item.words
+                }
+                game_data["Mobs"].append(mob_data)
+
+    # Save the game data to a file in JSON format
+    with open('savings.json', 'w') as file:
+        json.dump(game_data, file)
+
+# To save the game data
+save()
+
+menu_game = Menu()
+menu_game.append_option('EASY', menu_choose_easy_mode, 0)
+menu_game.append_option('MEDIUM', menu_choose_medium_mode, 0)
+menu_game.append_option('HARD', menu_choose_hard_mode, 0)
+menu_game.append_option('FAST', menu_choose_fast, 1)
+menu_game.append_option('BALANCED', menu_choose_balanced, 1)
+menu_game.append_option('STRONG', menu_choose_strong, 1)
+menu_game.append_option('LOAD', menu_choose_strong, 2)
+menu_game.append_option('SAVE', save, 2)
+menu_game.append_option('START', start, 2)
+menu_game.append_option('EXIT', exit, 3)
+
+
+
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
@@ -1082,14 +1155,12 @@ def menu(objects):
                     if select_count == 0:
                         menu_game.select()
                         select_count += 1
-                    if select_count == 1:
-                        print(select_count)
-                        HP_MENU = HP
-                        MOVE_SPEED_MENU = MOVE_SPEED
-                        BULLET_DAMAGE_MENU = BULLET_DAMAGE
-                        menu_game.select()
 
-                        print(HP_MENU, MOVE_SPEED_MENU, BULLET_DAMAGE_MENU)
+                    if menu_game.select() == True:
+                        switch_scene(scene1)
+
+                        play = False
+
         window.fill((0, 0, 0))
         menu_game.draw(window, 100, 100, 300, 300)
 
