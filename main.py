@@ -420,7 +420,7 @@ BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
 HP_MENU = [5, 6, 7, 8, 9, 10, 11, 12]
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
-EXPERIENCE = [7, 10, 13, 15, 19, 25, 32, 40]
+EXPERIENCE = [7, 14, 30, 50, 80, 150, 250, 400]
 MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
 BULLET_SPEED = [4, 5, 6, 7, 8, 9, 10, 11]
 BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
@@ -878,7 +878,9 @@ class Princess:
                     Bonus(self, self.bonus_probability)
                 if User.rank < len(EXPERIENCE) - 1:
                     User.xp += self.rank
+                    print(EXPERIENCE[User.rank])
                     if User.xp >= EXPERIENCE[User.rank]:
+                        print(EXPERIENCE[User.rank])
                         User.rank += 1
                 sound_mob_death.play()
 
