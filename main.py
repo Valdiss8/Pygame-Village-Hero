@@ -983,7 +983,7 @@ objects = [
     [mob2, User, mob3, mob4, mob5, boss]
 ]
 bullets = [[], [], [], []]
-
+SCENE_SAVED = 1
 
 # MENU funtions
 def menu_choose_easy_mode():
@@ -1028,7 +1028,6 @@ def menu_choose_strong():
 def exit():
     sys.exit()
 
-
 def start():
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
     BULLET_DAMAGE = BULLET_DAMAGE_MENU
@@ -1037,32 +1036,10 @@ def start():
     return True
 
 
-#def save():
-#    global objects
-#    with open('savings', 'w') as file:
-#        file.write(str(User.rank))
-#        file.write(str(User.rect))
-#        file.write(str(User.hp))
-#        file.write(str(User.scrolls))
-#        file.write(str(User.xp))
-#        file.write(str(Princess.rect))
-#        file.write(str(Princess.words))
-#        file.write(str(Boss.rank))
-#        file.write(str(Boss.rect))
-#        file.write(str(Boss.hp))
-#
-#        for object in objects:
-#            for item in object:
-#                if type(item) == Mob:
-#                    file.write(str(mob.rank))
-#                    file.write(str(mob.rect))
-#                    file.write(str(mob.hp))
-#
 def save():
-    global objects, User, Princess, Boss, scene_play
-
+    global objects, User, Princess, Boss, SCENE_SAVED
     # Create a dictionary to store game data
-    game_data = {"scene_play": scene_play,
+    game_data = {"scene_play": SCENE_SAVED,
         "User": {
             "rank": User.rank,
             "rect_x_y": (User.rect.x, User.rect.y),
@@ -1085,13 +1062,12 @@ def save():
                     "words": item.words
                 }
                 game_data["mobs"].append(mob_data)
-
-    # Save the game data to a file in JSON format
     with open('savings.json', 'w') as file:
         json.dump(game_data, file)
 
+
 def load():
-    global objects, User, princess, boss, scene_play
+    global objects, User, princess, boss, SCENE_SAVED
     with open('savings.json', 'r') as file:
         game_data = json.load(file)
 
@@ -1126,7 +1102,7 @@ menu_game.append_option('EXIT', exit, 3)
 
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
-previous_scene = menu
+
 current_scene = None
 
 # Main proces with scenes
@@ -1156,6 +1132,16 @@ def menu(objects):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_g:
                     switch_scene(scene1)
+                    play = False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    global SCENE_SAVED
+                    if SCENE_SAVED == 1:
+                        switch_scene(scene1)
+                    if SCENE_SAVED == 2:
+                        switch_scene(scene2)
+                    if SCENE_SAVED == 3:
+                        switch_scene(scene_boss)
+
                     play = False
                 if event.key == pygame.K_UP:
                     menu_game.switch(0, -1)
@@ -1195,6 +1181,8 @@ def scene1(objects):
                 switch_scene(scene2)
                 play = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                global SCENE_SAVED
+                SCENE_SAVED = scene_play
                 switch_scene(menu)
                 play = False
         global keys
@@ -1229,6 +1217,8 @@ def scene2(objects):
                 switch_scene(scene_boss)
                 play = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                global SCENE_SAVED
+                SCENE_SAVED = scene_play
                 switch_scene(menu)
                 play = False
 
@@ -1264,6 +1254,8 @@ def scene_boss(objects):
                 switch_scene(menu)
                 play = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                global SCENE_SAVED
+                SCENE_SAVED = scene_play
                 switch_scene(menu)
                 play = False
 
