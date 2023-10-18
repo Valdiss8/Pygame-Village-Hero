@@ -395,7 +395,6 @@ imgHero = [[[
 imgExit = pygame.image.load('images/map/exit.png')
 imgBrick = pygame.image.load('images/map/tile.jpg')
 
-
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
               pygame.image.load('images/bonus/healing.png')]
 
@@ -711,8 +710,8 @@ class Bonus:
 
 
 class Block:
-    def __init__(self, px, py, size ):
-        #objects.append(self)
+    def __init__(self, px, py, size):
+        # objects.append(self)
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 35
@@ -844,8 +843,11 @@ class Princess:
                 self.message_time_counter = 0
                 if self.message_group_counter == 2:
                     sound_danger.play()
-                    objects[1].append(Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'SHE', 'BELONGS', 'TO US', ]], 2))
-                    objects[1].append(Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'OUR BOSS', 'GRR', 'THE BEST', ]], 2))
+                    objects[1].append(
+                        Mob(self.rect.center[0] + 30, self.rect.center[1], 0, [['', 'SHE', 'BELONGS', 'TO US', ]], 2))
+                    objects[1].append(
+                        Mob(self.rect.center[0] - 30, self.rect.center[1], 0, [['', 'OUR BOSS', 'GRR', 'THE BEST', ]],
+                            2))
                 if self.message_group_counter == len(self.words):
                     objects[scene_play].remove(self)
                     for i in range(6):
@@ -965,14 +967,16 @@ class Menu:
                     pygame.draw.rect(surface, (0, 100, 0), option_rect)
                 surface.blit(option, option_rect)
 
+
 # Objects in different scenes
 ui = UI()
 User = Hero(100, 680, 0,
             (pygame.K_a, pygame.K_d, pygame.K_w, pygame.K_s, pygame.K_LEFT, pygame.K_DOWN, pygame.K_RIGHT))
 princess = Princess(50, 680, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good day', 'Sun', 'Flowers'],
-                                  ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
+                                 ['', 'O,no!', 'Help', 'Please!', 'Help!!!']], 0)
 
-princess_words = [['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'], ['', 'O,no!','Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'] ] * 300
+princess_words = [['', 'O,no!', 'Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'],
+                  ['', 'O,no!', 'Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!']] * 300
 princess_end = Princess(1150, 350, 0, princess_words, 0)
 boss = Boss(1100, 340, 0, [['', 'She', 'is', 'mine']], 7)
 objects = [[], [User, princess], [User, ], [User, boss, princess_end]]
@@ -994,9 +998,9 @@ for _ in range(25):
 
 for _ in range(18):
     while True:
-        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
-        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
-        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE + 7)
+        rect = pygame.Rect(x, y, TILE + 7, TILE + 7)
         fined = False
         for obj in objects[1]:
             if rect.colliderect(obj.rect):
@@ -1036,9 +1040,9 @@ for _ in range(25):
 
 for _ in range(18):
     while True:
-        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
-        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
-        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE + 7)
+        rect = pygame.Rect(x, y, TILE + 7, TILE + 7)
         fined = False
         for obj in objects[2]:
             if rect.colliderect(obj.rect):
@@ -1077,9 +1081,9 @@ for _ in range(10):
 
 for _ in range(10):
     while True:
-        x = randint(0, WIDTH // TILE - 1) * (TILE+7)
-        y = randint(1, HEIGHT // TILE - 1) * (TILE+7)
-        rect = pygame.Rect(x, y, TILE+7, TILE+7)
+        x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
+        y = randint(1, HEIGHT // TILE - 1) * (TILE + 7)
+        rect = pygame.Rect(x, y, TILE + 7, TILE + 7)
         fined = False
         for obj in objects[3]:
             if rect.colliderect(obj.rect):
@@ -1102,10 +1106,9 @@ for _ in range(50):
     block = Block(x, y, TILE)
     objects[3].append(block)
 
-
-
 SCENE_SAVED = 1
-SCENE_NAME = None
+SCENE_NAME = 'scene1'
+
 
 # MENU funtions
 def menu_choose_easy_mode():
@@ -1150,6 +1153,7 @@ def menu_choose_strong():
 def exit():
     sys.exit()
 
+
 def start():
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
     BULLET_DAMAGE = BULLET_DAMAGE_MENU
@@ -1163,25 +1167,25 @@ def save():
     # Create a dictionary to store game data
     game_data = {"scene_play": SCENE_SAVED,
                  "scene_name": SCENE_NAME,
-        "User": {
-            "rank": User.rank,
-            "rect_x_y": (User.rect.x, User.rect.y),
-            "hp": User.hp,
-            "scrolls": User.scrolls,
-            "xp": User.xp,
-        },
-        "princess": {
-            "rect_x_y": (princess.rect.x, princess.rect.y),
-            "words": princess.words,
-        },
-        "mobs": []}
+                 "User": {
+                     "rank": User.rank,
+                     "rect_x_y": (User.rect.x, User.rect.y),
+                     "hp": User.hp,
+                     "scrolls": User.scrolls,
+                     "xp": User.xp,
+                 },
+                 "princess": {
+                     "rect_x_y": (princess.rect.x, princess.rect.y),
+                     "words": princess.words,
+                 },
+                 "mobs": []}
     for obj in objects:
         for item in obj:
             if isinstance(item, Mob):
                 mob_data = {
                     "rank": item.rank,
                     "rect_x_y": (item.rect.x, item.rect.y),
-                    #"hp": item.hp,
+                    # "hp": item.hp,
                     "words": item.words
                 }
                 game_data["mobs"].append(mob_data)
@@ -1213,6 +1217,7 @@ def load():
     SCENE_NAME = scene_name
     start()
 
+
 menu_game = Menu()
 menu_game.append_option('EASY', menu_choose_easy_mode, 0)
 menu_game.append_option('MEDIUM', menu_choose_medium_mode, 0)
@@ -1225,11 +1230,10 @@ menu_game.append_option('SAVE', save, 2)
 menu_game.append_option('START', start, 2)
 menu_game.append_option('EXIT', exit, 3)
 
-
 animationTimer = 40 / MOVE_SPEED[User.rank]
 
-
 current_scene = None
+
 
 # Main proces with scenes
 def switch_scene(scene):
@@ -1283,16 +1287,16 @@ def menu(objects):
                         select_count += 1
 
                     if menu_game.select() == True:
-                        if SCENE_NAME:
-                            function_to_call = globals()[SCENE_NAME]
-                            function_to_call(objects)
-                        switch_scene(scene1)
+                        function_to_call = globals()[SCENE_NAME]
+                        function_to_call(objects)
+
                         play = False
 
         window.blit(back_map[scene_play], (0, 0))
         menu_game.draw(window, 150, 150, 300, 200)
         pygame.display.update()
         clock.tick(FPS)
+
 
 def scene1(objects):
     global scene_play, SCENE_NAME
@@ -1336,7 +1340,6 @@ def scene1(objects):
 
         window.blit(imgExit, (1160, 350))
 
-
         pygame.display.update()
         clock.tick(FPS)
 
@@ -1377,13 +1380,13 @@ def scene2(objects):
             User.rect.x = 70
             User.rect.y = 680
             switch_scene(scene_boss)
-            print(User.rect.x, User.rect.y)
             play = False
         window.blit(imgExit, (1160, 350))
         ui.update()
         ui.draw()
         pygame.display.update()
         clock.tick(FPS)
+
 
 def scene_boss(objects):
     global scene_play, SCENE_NAME
