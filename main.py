@@ -18,9 +18,11 @@ TILE = 40
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
-"""Window Name"""
+"""Window Name """
 pygame.display.set_caption('Village Hero')
 pygame.display.set_icon(pygame.image.load('images/sprites/hero_level_1/back_1.png'))
+
+"""Fonts"""
 fontUI = pygame.font.Font(None, 30)
 font_dialog = pygame.font.Font(None, 20)
 font_UI = pygame.font.Font(None, 30)
@@ -28,9 +30,7 @@ font_MOB_life = pygame.font.Font(None, 19)
 font_MENU = pygame.font.Font(None, 60)
 
 """Surface"""
-# surf = pygame.Surface((2000, 2000))
-# surf.fill('red')
-# window.blit(surf, (50, 50))
+
 pygame.display.update()
 
 """Images"""
@@ -397,7 +397,6 @@ imgHero = [[[
 ]
 imgExit = pygame.image.load('images/map/exit.png')
 imgBrick = pygame.image.load('images/map/tile.jpg')
-
 imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
               pygame.image.load('images/bonus/healing.png')]
 
@@ -406,7 +405,6 @@ imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
 sound_heavy_attack = pygame.mixer.Sound('sounds/heavy_attack.mp3')
-
 sound_super_attack = pygame.mixer.Sound('sounds/super_ball.mp3')
 sound_shield = pygame.mixer.Sound('sounds/shield.wav')
 sound_finish = pygame.mixer.Sound('sounds/dead_hero.mp3')
@@ -419,17 +417,20 @@ sound_level_up = pygame.mixer.Sound('sounds/level_up2.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_upset = pygame.mixer.Sound('sounds/map_level_upset.mp3')
 sound_map_next = pygame.mixer.Sound('sounds/map_next_level.mp3')
-# sound_menu = pygame.mixer.Sound('sounds/menu_sound.mp3')
 sound_menu_click = pygame.mixer.Sound('sounds/menu_switch.mp3')
 sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
 
+# Global variables for hero and mobs settings
+
+# Variable for menu
 MOVE_SPEED_MENU = [1, 1, 2, 2, 3, 3, 4, 4]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
 HP_MENU = [5, 6, 7, 8, 9, 10, 11, 15]
+# Constant variable. Not changed
 CONSTANT_MOVE_SPEED = [1, 1, 2, 2, 3, 3, 4, 4]
 CONSTANT_BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
 CONSTANT_HP = [5, 6, 7, 8, 9, 10, 11, 15]
-
+# Variables use for the main process of the game
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
 EXPERIENCE = [7, 14, 30, 50, 80, 100, 150, 200]
 MOVE_SPEED = [1, 1, 2, 2, 3, 3, 4, 4]
@@ -439,7 +440,6 @@ BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
 BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 55, 50, 45, 40, 35, 30, 30]
 SHIELD_LIMIT = [60, 60, 60, 60, 60, 60, 60, 60]
-
 HP = [5, 6, 7, 8, 9, 10, 11, 15]
 MOB_HP = [2, 4, 7, 10, 15, 25, 35, 100]
 MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 150]
@@ -448,8 +448,9 @@ MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
 MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 3, 3, 4]
 SCROLLS_LIMIT = [10, 10, 11, 11, 12, 13, 13, 14]
 
-
+# Life, inventory, level on the screen
 class UI:
+    """Hero inventory and level on the screen"""
     def __init__(self):
         pass
 
@@ -457,6 +458,7 @@ class UI:
         pass
 
     def draw(self):
+        """Draw inventory and hero level in the corner of the screen"""
         for obj in objects[scene_play]:
             # Hero life and scrolls
             if obj.type == 'hero':
@@ -605,16 +607,12 @@ class Hero:
             self.scrolls -= 1
 
         # Timers
-
         if self.shotTimer > 0:
             self.shotTimer -= 1
-
         if self.shieldTimer > 0:
             self.shieldTimer -= 1
-
         if self.animationTimer > 0:
             self.animationTimer -= 1
-
         else:
             self.animationTimer = 20 / MOVE_SPEED[User.rank]
             self.count += 1
@@ -622,9 +620,11 @@ class Hero:
                 User.count = 0
 
     def draw(self):
+        """Draw Hero on the screen"""
         window.blit(self.image, self.rect)
 
     def damage(self, value):
+        """Hero damaged"""
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
