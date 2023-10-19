@@ -425,16 +425,16 @@ sound_menu_click = pygame.mixer.Sound('sounds/menu_switch.mp3')
 sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
 
 
-MOVE_SPEED_MENU = [1, 2, 2, 3, 3, 4, 4, 5]
+MOVE_SPEED_MENU = [1, 1, 2, 2, 3, 3, 4, 4]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
-HP_MENU = [5, 6, 7, 8, 9, 10, 11, 12]
-CONSTANT_MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
+HP_MENU = [5, 6, 7, 8, 9, 10, 11, 15]
+CONSTANT_MOVE_SPEED = [1, 1, 2, 2, 3, 3, 4, 4]
 CONSTANT_BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
-CONSTANT_HP = [5, 6, 7, 8, 9, 10, 11, 12]
+CONSTANT_HP = [5, 6, 7, 8, 9, 10, 11, 15]
 
 DIRECTS = [[0, -1], [1, 0], [0, 1], [-1, 0]]
-EXPERIENCE = [7, 14, 30, 50, 80, 150, 250, 400]
-MOVE_SPEED = [1, 2, 2, 3, 3, 4, 4, 5]
+EXPERIENCE = [7, 14, 30, 50, 80, 100, 150, 200]
+MOVE_SPEED = [1, 1, 2, 2, 3, 3, 4, 4]
 BULLET_SPEED = [4, 5, 6, 7, 8, 9, 10, 11]
 BULLET_DAMAGE = [1, 1, 2, 2, 2, 3, 3, 3]
 BULLET_DISTANCE = [90, 100, 110, 120, 130, 140, 150, 160]
@@ -442,8 +442,8 @@ BULLET_SIZE = [2, 3, 4, 4, 5, 5, 6, 7]
 SHOT_DELAY = [60, 50, 40, 30, 25, 25, 25, 20]
 SHIELD_LIMIT = [60, 60, 60, 70, 70, 70, 80, 80]
 
-HP = [5, 6, 7, 8, 9, 10, 11, 12]
-MOB_HP = [2, 4, 7, 10, 15, 25, 35, 50]
+HP = [5, 6, 7, 8, 9, 10, 11, 15]
+MOB_HP = [2, 4, 7, 10, 15, 25, 35, 100]
 MOB_BULLET_DISTANCE = [60, 70, 80, 90, 100, 110, 120, 150]
 MOB_BULLET_DAMAGE = [1, 1, 1, 2, 1, 2, 1, 3]
 MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
@@ -1238,9 +1238,17 @@ def load():
         game_data = json.load(file)
 
     # Access and use the loaded game data as needed
+    scene_play = game_data["scene_play"]
     scene_name = game_data["scene_name"]
     User.rank = game_data["User"]["rank"]
     User.rect.x, User.rect.y = game_data["User"]["rect_x_y"]
+
+    #Detection collision
+    for obj in objects[scene_play]:
+        if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(User.rect):
+            objects[scene_play].remove(obj)
+
+
     User.hp = game_data["User"]["hp"]
     User.scrolls = game_data["User"]["scrolls"]
     User.xp = game_data["User"]["xp"]
