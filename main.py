@@ -918,9 +918,7 @@ class Princess:
                     Bonus(self, self.bonus_probability)
                 if User.rank < len(EXPERIENCE) - 1:
                     User.xp += self.rank
-                    print(EXPERIENCE[User.rank])
                     if User.xp >= EXPERIENCE[User.rank]:
-                        print(EXPERIENCE[User.rank])
                         User.rank += 1
                         sound_level_up.play()
                 sound_mob_death.play()
