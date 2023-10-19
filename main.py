@@ -1,12 +1,7 @@
 import json
-import pickle
 import sys
-
-import mixer as mixer
 import pygame
 from random import randint
-
-from pygame.mixer import music
 
 pygame.init()
 '''Interface'''
@@ -17,6 +12,7 @@ TILE = 40
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
+pygame.display.update()
 
 """Window Name """
 pygame.display.set_caption('Village Hero')
@@ -28,10 +24,6 @@ font_dialog = pygame.font.Font(None, 20)
 font_UI = pygame.font.Font(None, 30)
 font_MOB_life = pygame.font.Font(None, 19)
 font_MENU = pygame.font.Font(None, 60)
-
-"""Surface"""
-
-pygame.display.update()
 
 """Images"""
 
@@ -448,9 +440,11 @@ MOB_SHOT_DELAY = [30, 30, 30, 30, 20, 20, 20, 20]
 MOB_BULLET_SIZE = [1, 1, 1, 2, 2, 3, 3, 4]
 SCROLLS_LIMIT = [10, 10, 11, 11, 12, 13, 13, 14]
 
+
 # Life, inventory, level on the screen
 class UI:
     """Hero inventory and level on the screen"""
+
     def __init__(self):
         pass
 
@@ -484,6 +478,7 @@ class UI:
                 text_hp = font_MOB_life.render(str(obj.hp), 0, 'red')
                 rect = text_hp.get_rect(center=(obj.rect.center[0], obj.rect.center[1] - obj.rect.height // 2))
                 window.blit(text_hp, rect)
+
 
 # Main character
 class Hero:
@@ -629,12 +624,13 @@ class Hero:
             self.hp -= value
             if self.hp <= 0:
                 sound_finish.play()
-                switch_scene(menu(objects))
                 objects[scene_play].remove(self)
+
 
 # Bullet for attack
 class Bullet:
     """Bullets"""
+
     def __init__(self, parent, px, py, dx, dy, damage, distance, size, collor='black'):
         """Init bullet. Shooter, location and movement, damage, distance, size, collor"""
         bullets[scene_play].append(self)
@@ -670,9 +666,11 @@ class Bullet:
         """Draw bullets"""
         pygame.draw.circle(window, self.color, (self.px, self.py), self.size)
 
+
 # Explosion after hit
 class Bang:
     """Animation for a hit"""
+
     def __init__(self, px, py):
         """Init location"""
         objects[scene_play].append(self)
