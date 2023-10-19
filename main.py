@@ -403,7 +403,6 @@ imgBonuses = [pygame.image.load('images/bonus/magic_scroll.png'),
 
 """Sounds"""
 
-
 sound_dest = pygame.mixer.Sound('sounds/destroy.wav')
 sound_shot = pygame.mixer.Sound('sounds/shot.mp3')
 sound_heavy_attack = pygame.mixer.Sound('sounds/heavy_attack.mp3')
@@ -420,10 +419,9 @@ sound_level_up = pygame.mixer.Sound('sounds/level_up2.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
 sound_map_level_upset = pygame.mixer.Sound('sounds/map_level_upset.mp3')
 sound_map_next = pygame.mixer.Sound('sounds/map_next_level.mp3')
-#sound_menu = pygame.mixer.Sound('sounds/menu_sound.mp3')
+# sound_menu = pygame.mixer.Sound('sounds/menu_sound.mp3')
 sound_menu_click = pygame.mixer.Sound('sounds/menu_switch.mp3')
 sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
-
 
 MOVE_SPEED_MENU = [1, 1, 2, 2, 3, 3, 4, 4]
 BULLET_DAMAGE_MENU = [1, 1, 2, 2, 2, 3, 3, 3]
@@ -635,8 +633,6 @@ class Hero:
                 sound_finish.play()
                 switch_scene(menu(objects))
                 objects[scene_play].remove(self)
-
-
 
 
 class Bullet:
@@ -952,6 +948,7 @@ class Boss(Mob):
                 Bullet(self, self.rect.centerx, self.rect.centery, 0, 1, self.bulletDamage, self.bulletDistance,
                        self.bulletSize)
                 sound_mob_shot.play()
+
     def damage(self, value):
         if self.shield == False:
             self.hp -= value
@@ -1148,11 +1145,9 @@ def menu_choose_easy_mode():
     HP_MENU = [i + 3 for i in HP_MENU]
 
 
-
 def menu_choose_medium_mode():
     global HP_MENU, CONSTANT_HP
     HP_MENU = CONSTANT_HP
-
 
 
 def menu_choose_hard_mode():
@@ -1162,7 +1157,7 @@ def menu_choose_hard_mode():
 
 
 def menu_choose_fast():
-    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE , CONSTANT_MOVE_SPEED
+    global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
     MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = [i - 1 if i > 1 else i for i in BULLET_DAMAGE_MENU]
@@ -1192,7 +1187,7 @@ def start():
     BULLET_DAMAGE = BULLET_DAMAGE_MENU
     MOVE_SPEED = MOVE_SPEED_MENU
     HP = HP_MENU
-    # If deleted not change hp as selected. Otherwise doesn't load hp
+
     User.hp = HP[User.rank]
     return True
 
@@ -1210,7 +1205,7 @@ def save():
                      "scrolls": User.scrolls,
                      "xp": User.xp,
                      "HP": HP,
-                     "MOVE_SPEED": MOVE_SPEED ,
+                     "MOVE_SPEED": MOVE_SPEED,
                      "BULLET_DAMAGE": BULLET_DAMAGE
                  },
                  "princess": {
@@ -1243,11 +1238,11 @@ def load():
     User.rank = game_data["User"]["rank"]
     User.rect.x, User.rect.y = game_data["User"]["rect_x_y"]
 
-    #Detection collision
+    # Detection collision
     for obj in objects[scene_play]:
-        if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(User.rect):
+        if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(
+                User.rect):
             objects[scene_play].remove(obj)
-
 
     User.hp = game_data["User"]["hp"]
     User.scrolls = game_data["User"]["scrolls"]
@@ -1286,6 +1281,7 @@ def switch_scene(scene):
     global current_scene
     current_scene = scene
 
+
 def menu(objects):
     global scene_play
     scene_play = 0
@@ -1299,7 +1295,6 @@ def menu(objects):
                 play = False
                 switch_scene(None)
             elif event.type == pygame.KEYDOWN:
-
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     global SCENE_SAVED
@@ -1326,7 +1321,7 @@ def menu(objects):
                         function_to_call = globals()[SCENE_NAME]
                         function_to_call(objects)
                         play = False
-        #sound_menu.play()
+        # sound_menu.play()
         window.blit(back_map[scene_play], (0, 0))
         menu_game.draw(window, 150, 150, 300, 200)
         pygame.display.update()
@@ -1344,7 +1339,6 @@ def scene1(objects):
             if event.type == pygame.QUIT:
                 play = False
                 switch_scene(None)
-
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 global SCENE_SAVED
@@ -1368,10 +1362,10 @@ def scene1(objects):
             SCENE_SAVED = scene_play + 1
             User.rect.x = 30
             User.rect.y = 350
-            for obj in objects[scene_play+1]:
+            for obj in objects[scene_play + 1]:
                 if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(
                         User.rect):
-                    objects[scene_play+1].remove(obj)
+                    objects[scene_play + 1].remove(obj)
             switch_scene(scene2)
             sound_danger.play()
             play = False
@@ -1418,10 +1412,10 @@ def scene2(objects):
             User.rect.y = 680
             sound_danger.play()
             # Collision detection
-            for obj in objects[scene_play+1]:
+            for obj in objects[scene_play + 1]:
                 if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(
                         User.rect):
-                    objects[scene_play+1].remove(obj)
+                    objects[scene_play + 1].remove(obj)
             switch_scene(scene_boss)
             play = False
         window.blit(imgExit, (1160, 350))
