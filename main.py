@@ -1093,7 +1093,8 @@ for _ in range(150):
     block = Block(x, y, TILE)
     objects[2].append(block)
 
-# Scene Boss
+# Scene Boss adding characters and walls
+# Scene Boss adding mobs level 5
 for _ in range(10):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1107,6 +1108,7 @@ for _ in range(10):
             break
     objects[3].append(Mob(x, y, 0, [['', 'We will', 'destroy', 'you']], 5))
 
+# Scene Boss adding mobs level 4
 for _ in range(10):
     while True:
         x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
@@ -1120,6 +1122,7 @@ for _ in range(10):
             break
     objects[3].append(Mob(x, y, 0, [['', 'Attack', 'Catch him', 'Food']], 4))
 
+# Scene Boss adding blocks
 for _ in range(70):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1138,25 +1141,29 @@ SCENE_SAVED = 1
 SCENE_NAME = 'scene1'
 
 
-# MENU funtions
+# MENU functions change modes and customize character
 def menu_choose_easy_mode():
+    """Menu pressed easy"""
     global HP_MENU, CONSTANT_HP
     HP_MENU = CONSTANT_HP
     HP_MENU = [i + 3 for i in HP_MENU]
 
 
 def menu_choose_medium_mode():
+    """Menu pressed medium"""
     global HP_MENU, CONSTANT_HP
     HP_MENU = CONSTANT_HP
 
 
 def menu_choose_hard_mode():
+    """Menu pressed hard"""
     global HP_MENU, CONSTANT_HP
     HP_MENU = CONSTANT_HP
     HP_MENU = [i - 2 for i in HP_MENU]
 
 
 def menu_choose_fast():
+    """Menu pressed fast"""
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
     MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
@@ -1165,12 +1172,14 @@ def menu_choose_fast():
 
 
 def menu_choose_balanced():
+    """Menu pressed balanced"""
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
     MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
 
 
 def menu_choose_strong():
+    """Menu pressed strong button"""
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, CONSTANT_BULLET_DAMAGE, CONSTANT_MOVE_SPEED
     BULLET_DAMAGE_MENU = CONSTANT_BULLET_DAMAGE
     MOVE_SPEED_MENU = CONSTANT_MOVE_SPEED
@@ -1179,20 +1188,23 @@ def menu_choose_strong():
 
 
 def exit():
+    """Exit from menu"""
     sys.exit()
 
 
 def start():
+    """Start botton pressed function"""
     global BULLET_DAMAGE_MENU, MOVE_SPEED_MENU, HP_MENU, BULLET_DAMAGE, MOVE_SPEED, HP
     BULLET_DAMAGE = BULLET_DAMAGE_MENU
     MOVE_SPEED = MOVE_SPEED_MENU
     HP = HP_MENU
-
     User.hp = HP[User.rank]
+    # Return True to separate start button from other buttons pressed in the menu. Sends signal to the main cycle
     return True
 
 
 def save():
+    """Save data"""
     global objects, User, SCENE_SAVED, SCENE_NAME, HP, MOVE_SPEED, BULLET_DAMAGE
     # Create a dictionary to store game data
 
@@ -1213,6 +1225,7 @@ def save():
                      "words": princess.words,
                  },
                  "mobs": []}
+    # Searching for boss data and saving
     for obj in objects:
         for item in obj:
             if isinstance(item, Mob) and item.rank == 7:
@@ -1228,6 +1241,7 @@ def save():
 
 
 def load():
+    """Load saved data"""
     global objects, User, princess, boss, SCENE_SAVED, SCENE_NAME, BULLET_DAMAGE, MOVE_SPEED, HP
     with open('savings.json', 'r') as file:
         game_data = json.load(file)
@@ -1254,11 +1268,10 @@ def load():
     for mob in game_data["mobs"]:
         if mob["rank"] == 7:
             boss.hp = mob["hp"]
-
     SCENE_NAME = scene_name
     return True
 
-
+# Menu add lines
 menu_game = Menu()
 menu_game.append_option('EASY', menu_choose_easy_mode, 0)
 menu_game.append_option('MEDIUM', menu_choose_medium_mode, 0)
@@ -1271,18 +1284,20 @@ menu_game.append_option('SAVE', save, 2)
 menu_game.append_option('START', start, 2)
 menu_game.append_option('EXIT', exit, 3)
 
-animationTimer = 40 / MOVE_SPEED[User.rank]
-
+# Main process with scenes
 current_scene = None
+animationTimer = 40 / MOVE_SPEED[User.rank]
 
 
 # Main proces with scenes
 def switch_scene(scene):
+    """Change scenes"""
     global current_scene
     current_scene = scene
 
 
 def menu(objects):
+    """Menu played """
     global scene_play
     scene_play = 0
     play = True
@@ -1329,11 +1344,11 @@ def menu(objects):
 
 
 def scene1(objects):
+    """Scene 1 play """
     global scene_play, SCENE_NAME
     scene_play = 1
     SCENE_NAME = 'scene1'
     play = True
-    print(HP, HP_MENU, User.hp)
     while play:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1377,12 +1392,12 @@ def scene1(objects):
 
 
 def scene2(objects):
+    """Scene 2 play """
     global scene_play, SCENE_NAME
     scene_play = 2
     SCENE_NAME = 'scene2'
     play = True
     while play:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 play = False
@@ -1426,6 +1441,7 @@ def scene2(objects):
 
 
 def scene_boss(objects):
+    """Scene boss play """
     global scene_play, SCENE_NAME
     scene_play = 3
     SCENE_NAME = 'scene_boss'
