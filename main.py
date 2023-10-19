@@ -483,14 +483,12 @@ class UI:
                 rect = text_hp.get_rect(center=(obj.rect.center[0], obj.rect.center[1] - obj.rect.height // 2))
                 window.blit(text_hp, rect)
 
-
+# Main character
 class Hero:
     """Main character"""
 
     def __init__(self, px, py, direct, keyList):
-
-        # objects[scene_play].append(self)
-
+        """Init Hero. Location and keys for activities"""
         self.type = 'hero'
         self.rank = 0
         self.count = 0
@@ -524,8 +522,8 @@ class Hero:
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self):
+        """Update Hero. Movement, attacks"""
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
-
         self.image = imgHero[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
         self.moveSpeed = MOVE_SPEED[self.rank]
@@ -555,13 +553,13 @@ class Hero:
             self.rect.y += self.moveSpeed
             self.direct = 2
             self.image = imgHero[self.rank][self.direct][self.count]
-        # collision
+        # Collision
         for obj in objects[scene_play]:
             if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
                     obj.rect):
                 self.rect.topleft = oldX, oldY
 
-        # map edge
+        # Map edge
         if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.rect.topleft = oldX, oldY
 
@@ -574,7 +572,7 @@ class Hero:
             self.shotTimer = self.shotDelay
             sound_shot.play()
 
-        # Heavy attack
+        # Heavy attack. Longer recharge
         if keys[self.keySHIELD] and keys[self.keySHOT] and self.shieldDelay - 5 > self.shotTimer > self.shotDelay - 10:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
@@ -582,7 +580,7 @@ class Hero:
                    self.bulletSize * 3, 'yellow')
             self.shotTimer = self.shotDelay * 3
             sound_heavy_attack.play()
-
+        # Shield
         if keys[self.keySHIELD] and self.shotTimer == 0:
             self.shieldTimer = self.shieldDelay
             self.shotTimer = self.shotDelay + self.shieldDelay
@@ -596,7 +594,7 @@ class Hero:
             self.shield = False
             sound_shield.stop()
 
-        # Super ball
+        # Super ball from the Hero inventory
         if keys[self.keySUPER] and self.shotTimer == 0 and self.scrolls:
             dx = DIRECTS[self.direct][0] * self.bulletSpeed
             dy = DIRECTS[self.direct][1] * self.bulletSpeed
@@ -634,9 +632,11 @@ class Hero:
                 switch_scene(menu(objects))
                 objects[scene_play].remove(self)
 
-
+# Bullet for attack
 class Bullet:
+    """Bullets"""
     def __init__(self, parent, px, py, dx, dy, damage, distance, size, collor='black'):
+        """Init bullet. Shooter, location and movement, damage, distance, size, collor"""
         bullets[scene_play].append(self)
         self.parent = parent
         self.px, self.py = px, py
@@ -647,13 +647,15 @@ class Bullet:
         self.color = collor
 
     def update(self):
+        """Bullet movement on the screen"""
         self.px += self.dx
         self.py += self.dy
-
+        # Determine the distance
         if abs(self.px - self.parent.rect.x) > self.distance or abs(
                 self.py - self.parent.rect.y) > self.distance:
             bullets[scene_play].remove(self)
         else:
+            # Determine hit of the bullet
             for obj in objects[scene_play]:
                 if obj != self.parent and obj.type != self.parent.type and obj.type != 'princess' and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.collidepoint(
                         self.px,
@@ -665,37 +667,50 @@ class Bullet:
                     break
 
     def draw(self):
+        """Draw bullets"""
         pygame.draw.circle(window, self.color, (self.px, self.py), self.size)
 
-
+# Explosion after hit
 class Bang:
+    """Animation for a hit"""
     def __init__(self, px, py):
+        """Init location"""
         objects[scene_play].append(self)
         self.type = 'bang'
         self.px, self.py = px, py
         self.frame = 0
 
     def update(self):
+        """Change frames of the explosion"""
         self.frame += 0.3
         if self.frame >= 2:
             objects[scene_play].remove(self)
 
     def draw(self):
+        """Display explosion on the screen"""
         image = imgBangs[int(self.frame)]
         rect = image.get_rect(center=(self.px, self.py))
         window.blit(image, rect)
 
 
+# Life and Supper Balls for the inventory
 class Bonus:
+    """Items for the inventory. Appear from monsters.
+    They fall from monsters, after monsters death.
+    Randomly chosen from: Life, Supper Ball, and nothing"""
+
     def __init__(self, parent, bonusNum):
+        """They appear from monsters, and kind of bonus"""
         objects[scene_play].append(self)
         self.type = 'bonus'
         self.bonusNum = bonusNum
         self.image = imgBonuses[self.bonusNum]
         self.rect = self.image.get_rect(center=parent.rect.center)
+        # Time the present on the screen
         self.timer = 600
 
     def update(self):
+        """Stay on the screen for certain time then disappear"""
         if self.timer > 0:
             self.timer -= 1
         else:
@@ -716,31 +731,42 @@ class Bonus:
                     break
 
     def draw(self):
+        """Draw bonuses on the screen"""
         if self.timer % 30 < 15:
             window.blit(self.image, self.rect)
 
 
+# Bricks and walls in the game
 class Block:
+    """Bricks class in the game"""
+
     def __init__(self, px, py, size):
-        # objects.append(self)
+        """Init location and size"""
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
         self.hp = 15
 
     def update(self):
+        """They don't move, so no need in update"""
         pass
 
     def draw(self):
+        """Draw on the screen"""
         window.blit(imgBrick, self.rect)
 
     def damage(self, value):
+        """Damage and disappearance"""
         self.hp -= value
         if self.hp <= 0:
             objects[scene_play].remove(self)
 
 
+# Words said by over objects heads
 class Message:
+    """Message showed over mobs heads"""
+
     def __init__(self, parent, word, color='black'):
+        """Init mob, text, color"""
         objects[scene_play].append(self)
         self.type = 'message'
         self.bottom_right = parent.rect.topright
@@ -753,8 +779,8 @@ class Message:
         self.rect = self.image.get_rect(bottomright=self.bottom_right)
 
     def update(self):
+        """Change words from the message"""
         self.timer += 1
-
         if self.timer >= 30:
             self.message_count += 1
             self.timer = 0
@@ -764,13 +790,17 @@ class Message:
             objects[scene_play].remove(self)
 
     def draw(self):
+        """Draw words on the screen"""
         self.rect = self.image.get_rect(bottomright=self.bottom_right)
         window.blit(self.text, (self.rect.x + 28, self.rect.y + 28))
 
 
+# Princess. From this class enemies will be inherited
 class Princess:
+    """Princess for game"""
+
     def __init__(self, px, py, direct, words, rank):
-        # objects[scene_play].append(self)
+        """Init direction, location, words, rank"""
         self.type = 'princess'
         self.count = 0
         self.rank = rank
@@ -791,6 +821,7 @@ class Princess:
         self.activity_speed = 4 - self.rank // 2
 
     def update(self):
+        """Update princess"""
         self.image = pygame.transform.scale(self.image, (self.image.get_width() - 5, self.image.get_height() - 5))
         self.image = imgPrincess[self.rank][self.direct][0]
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -834,7 +865,7 @@ class Princess:
             if obj != self and obj.type != 'bang' and obj.type != 'message' and obj.type != 'bonus' and self.rect.colliderect(
                     obj.rect):
                 self.rect.topleft = oldX, oldY
-        # map edge
+        # Map edge
         if self.rect.left < 0 or self.rect.right > WIDTH or self.rect.top < 0 or self.rect.bottom > HEIGHT:
             self.rect.topleft = oldX, oldY
 
@@ -849,6 +880,7 @@ class Princess:
                 self.message_time_counter += 1
                 Message(self, self.words[self.message_group_counter][self.message_time_counter])
 
+            # Programing enemies attack disappearance of the princess.
             if self.message_time_counter == len(self.words[self.message_group_counter]) - 1:
                 self.message_group_counter += 1
                 self.message_time_counter = 0
@@ -875,9 +907,11 @@ class Princess:
                 self.count = 0
 
     def draw(self):
+        """Draw princess on the screen in the main cycle"""
         window.blit(self.image, self.rect)
 
     def damage(self, value):
+        """Damage. Princess has shield, but inherited classes will use this logic"""
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
@@ -894,8 +928,12 @@ class Princess:
                 sound_mob_death.play()
 
 
+# Enemies class
 class Mob(Princess):
+    """Enemies 7 levels"""
+
     def __init__(self, px, py, direct, words, rank):
+        """Inherit from Princess class and add attack abilities"""
         super().__init__(px, py, direct, words, rank)
         self.rank = rank
         self.type = 'mob'
@@ -911,6 +949,8 @@ class Mob(Princess):
         self.shotTimer = 0
 
     def update(self):
+        """To the parent massage group tied events (disappearance).
+        Change message. Only last message group is active for mobs."""
         # Making sure that mobs message not end, and they will not disappear
         self.message_group_counter = -1
         super().update()
@@ -926,8 +966,12 @@ class Mob(Princess):
                 sound_mob_shot.play()
 
 
+# Boss class
 class Boss(Mob):
+    """Boss class as mob level 7"""
+
     def update(self):
+        """Inherit from parend and change attack. Attack many directions"""
         super().update()
         if abs(abs(User.rect.center[0]) - abs(self.rect.center[0])) < self.bulletDistance and abs(
                 abs(User.rect.center[1]) - abs(self.rect.center[1])) < self.bulletDistance and self.shotTimer == 0:
@@ -950,6 +994,7 @@ class Boss(Mob):
                 sound_mob_shot.play()
 
     def damage(self, value):
+        """Boss if damaged and defeated, music victory"""
         if self.shield == False:
             self.hp -= value
             if self.hp <= 0:
@@ -960,33 +1005,39 @@ class Boss(Mob):
                     User.xp += self.rank
                     if User.xp >= EXPERIENCE[User.rank]:
                         User.rank += 1
-
                 sound_map_level_1_happy.play()
 
 
 # Menu
 class Menu:
-    def __init__(self):  # option_surfaces, callbacks,
+    """Game menu"""
+
+    def __init__(self):
+        """Init menu"""
         self.option_surfaces = [[], [], [], []]
         self.callbacks = [[], [], [], []]
         self.current_group = 0
         self.current_option_index = 0
 
     def append_option(self, option, callback, group):
+        """Add buttons to the menu"""
         self.option_surfaces[group].append(font_MENU.render(option, 0, 'red'))
         self.callbacks[group].append(callback)
 
     def switch(self, vertical_direction, horisontal_direction):
+        """Hover over buttons in menu"""
         sound_menu_click.play()
         self.current_group = max(0, min(self.current_group + vertical_direction, len(self.option_surfaces) - 1))
         self.current_option_index = max(0, min(self.current_option_index + horisontal_direction,
                                                len(self.option_surfaces[self.current_group]) - 1))
 
     def select(self):
+        """Press buttons in menu"""
         sound_menu_select.play()
         return self.callbacks[self.current_group][self.current_option_index]()
 
     def draw(self, surface, x, y, option_group_padding, options_surfaces_padding):
+        """Draw menu in the game cycle"""
         for i, group in enumerate(self.option_surfaces):
             for j, option in enumerate(self.option_surfaces[i]):
                 option_rect = option.get_rect()
@@ -1005,12 +1056,13 @@ princess = Princess(50, 680, 0, [['', 'Good day', 'Sun', 'Flowers'], ['', 'Good 
 
 princess_words = [['', 'O,no!', 'Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!'],
                   ['', 'O,no!', 'Please!', 'Help!!!', 'You can win', 'You can do it', 'Please!!!']] * 300
+# Princess boss scene
 princess_end = Princess(1150, 350, 0, princess_words, 0)
 boss = Boss(1100, 340, 0, [['', 'She', 'is', 'mine']], 7)
 objects = [[], [User, princess], [User, ], [User, boss, princess_end]]
 bullets = [[], [], [], []]
 
-# Scene 1 objects
+# Scene adding mobs level 1
 for _ in range(25):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1024,6 +1076,7 @@ for _ in range(25):
             break
     objects[1].append(Mob(x, y, 0, [['', 'GRR', 'RRR', 'Buga-ga']], 1))
 
+# Scene1 adding mobs level 2
 for _ in range(18):
     while True:
         x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
@@ -1037,6 +1090,7 @@ for _ in range(18):
             break
     objects[1].append(Mob(x, y, 0, [['', 'Uuuu', 'Shshsh', 'Aaaaa']], 2))
 
+# Scene1 adding blocks
 for _ in range(150):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1051,8 +1105,8 @@ for _ in range(150):
     block = Block(x, y, TILE)
     objects[1].append(block)
 
-# Scene 2 objects
-
+# Scene2 adding characters and walls
+# Scene2 adding mobs level 3
 for _ in range(25):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1065,7 +1119,7 @@ for _ in range(25):
         if not fined:
             break
     objects[2].append(Mob(x, y, 0, [['', 'AAAA', 'SHshSH', 'Buga-ga']], 3))
-
+# Scene2 adding mobs level 4
 for _ in range(18):
     while True:
         x = randint(0, WIDTH // TILE - 1) * (TILE + 7)
@@ -1078,7 +1132,7 @@ for _ in range(18):
         if not fined:
             break
     objects[2].append(Mob(x, y, 0, [['', 'Catch him', 'AAAAA', 'Advance']], 4))
-
+# Scene2 adding blocks
 for _ in range(150):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
@@ -1136,9 +1190,6 @@ for _ in range(70):
             break
     block = Block(x, y, TILE)
     objects[3].append(block)
-
-SCENE_SAVED = 1
-SCENE_NAME = 'scene1'
 
 
 # MENU functions change modes and customize character
@@ -1271,6 +1322,7 @@ def load():
     SCENE_NAME = scene_name
     return True
 
+
 # Menu add lines
 menu_game = Menu()
 menu_game.append_option('EASY', menu_choose_easy_mode, 0)
@@ -1287,6 +1339,10 @@ menu_game.append_option('EXIT', exit, 3)
 # Main process with scenes
 current_scene = None
 animationTimer = 40 / MOVE_SPEED[User.rank]
+
+# Global variables to control scenes index and names
+SCENE_SAVED = 1
+SCENE_NAME = 'scene1'
 
 
 # Main proces with scenes
