@@ -1220,11 +1220,11 @@ def save():
                  "mobs": []}
     for obj in objects:
         for item in obj:
-            if isinstance(item, Mob):
+            if isinstance(item, Mob) and item.rank == 7:
                 mob_data = {
                     "rank": item.rank,
                     "rect_x_y": (item.rect.x, item.rect.y),
-                    # "hp": item.hp,
+                    "hp": item.hp,
                     "words": item.words
                 }
                 game_data["mobs"].append(mob_data)
@@ -1247,15 +1247,10 @@ def load():
     HP = game_data["User"]["HP"]
     MOVE_SPEED = game_data["User"]["MOVE_SPEED"]
     BULLET_DAMAGE = game_data["User"]["BULLET_DAMAGE"]
-    print('load', User.hp)
-    for mob in game_data["mobs"]:
 
-        if mob["rank"] == 0:
-            Princess(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+    for mob in game_data["mobs"]:
         if mob["rank"] == 7:
-            Boss(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
-        else:
-            Mob(mob["rect_x_y"][0], mob["rect_x_y"][1], 0, mob["words"], mob["rank"])
+            boss.hp = mob["hp"]
 
     SCENE_NAME = scene_name
     return True
