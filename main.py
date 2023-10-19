@@ -729,7 +729,7 @@ class Block:
         # objects.append(self)
         self.type = 'block'
         self.rect = pygame.Rect(px, py, size, size)
-        self.hp = 35
+        self.hp = 15
 
     def update(self):
         pass
@@ -1123,7 +1123,7 @@ for _ in range(10):
             break
     objects[3].append(Mob(x, y, 0, [['', 'Attack', 'Catch him', 'Food']], 4))
 
-for _ in range(50):
+for _ in range(70):
     while True:
         x = randint(0, WIDTH // TILE - 1) * TILE
         y = randint(1, HEIGHT // TILE - 1) * TILE
