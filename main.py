@@ -1198,7 +1198,7 @@ def start():
 
 
 def save():
-    global objects, User, Princess, Boss, SCENE_SAVED, SCENE_NAME, HP, MOVE_SPEED, BULLET_DAMAGE
+    global objects, User, SCENE_SAVED, SCENE_NAME, HP, MOVE_SPEED, BULLET_DAMAGE
     # Create a dictionary to store game data
 
     game_data = {"scene_play": SCENE_SAVED,
@@ -1368,6 +1368,10 @@ def scene1(objects):
             SCENE_SAVED = scene_play + 1
             User.rect.x = 30
             User.rect.y = 350
+            for obj in objects[scene_play+1]:
+                if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(
+                        User.rect):
+                    objects[scene_play+1].remove(obj)
             switch_scene(scene2)
             sound_danger.play()
             play = False
@@ -1407,12 +1411,17 @@ def scene2(objects):
         for obj in objects[scene_play]:
             obj.update()
             obj.draw()
+        # jump to a new scene
         if User.rect.x >= 1160 and abs(User.rect.y - 350) <= 20:
             SCENE_SAVED = scene_play + 1
             User.rect.x = 70
             User.rect.y = 680
             sound_danger.play()
-
+            # Collision detection
+            for obj in objects[scene_play+1]:
+                if obj.type != User.type and obj.type != 'bang' and obj.type != 'bonus' and obj.type != 'message' and obj.rect.colliderect(
+                        User.rect):
+                    objects[scene_play+1].remove(obj)
             switch_scene(scene_boss)
             play = False
         window.blit(imgExit, (1160, 350))
