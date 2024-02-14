@@ -2,7 +2,7 @@ Village Hero.
 (Pygame)
 
 Save the Princess. 
-3 map levels. 8 levels of Hero. 7 different monsters. 
+3 maps. 8 levels of Hero. 7 different monsters. 
 
 Menu controls:
 Left, Right, Up, Down  - switching items. 
