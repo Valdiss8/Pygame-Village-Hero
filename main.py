@@ -407,7 +407,7 @@ sound_pickup_magic_scroll = pygame.mixer.Sound('sounds/pick_up_scroll.mp3')
 sound_pickup_healing = pygame.mixer.Sound('sounds/pick_up_healing.mp3')
 sound_level_up = pygame.mixer.Sound('sounds/level_up2.mp3')
 sound_map_level_1_happy = pygame.mixer.Sound('sounds/map_level1_happy.mp3')
-sound_map_level_upset = pygame.mixer.Sound('sounds/map_level_upset.mp3')
+sound_map_level_upset = pygame.mixer.Sound('sounds/map_level1_upset.mp3')
 sound_map_next = pygame.mixer.Sound('sounds/map_next_level.mp3')
 sound_menu_click = pygame.mixer.Sound('sounds/menu_switch.mp3')
 sound_menu_select = pygame.mixer.Sound('sounds/menu_select.mp3')
@@ -891,8 +891,7 @@ class Princess:
                             2))
                 if self.message_group_counter == len(self.words):
                     objects[scene_play].remove(self)
-                    for i in range(6):
-                        sound_map_level_upset.play()
+                    sound_map_level_upset.play()
                     Message(self, 'Help me!', 'red')
                     Message(User, 'I need to help', 'red')
 
