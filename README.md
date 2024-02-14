@@ -1,7 +1,7 @@
 Village Hero.
 (Pygame)
 
-Find and Save the Princess. 
+Save the Princess. 
 3 map levels. 8 levels of Hero. 7 different monsters. 
 
 Menu controls:
